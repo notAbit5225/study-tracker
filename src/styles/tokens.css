@@ -15,10 +15,12 @@
   --rust-deep: #9e4e1d;
   --olive: #7d8a4a;
 
-  /* subject colours – used for bars and tags */
-  --c-maths: var(--mustard-bright);
-  --c-english: var(--rust);
-  --c-georgian: var(--olive);
+  /* subject colours – used for bars, charts and tags.
+     Checked with a colour-blindness validator (red-green and blue-yellow):
+     every pair stays distinguishable, on both the dark and the cream ground. */
+  --c-maths: #ba8a16;
+  --c-english: #b24a26;
+  --c-georgian: #1f9c80;
 
   /* roles (these flip between themes) */
   --bg: var(--espresso);
@@ -57,8 +59,8 @@
   --accent-ink: #fbf3e2;
   --line: rgba(46, 32, 23, 0.16);
   --grain-opacity: 0.12;
-  --c-maths: var(--mustard);
-  --c-english: var(--rust-deep);
-  --c-georgian: #5d6a30;
+  --c-maths: #ab7e10;
+  --c-english: #963318;
+  --c-georgian: #00836c;
   color-scheme: light;
 }

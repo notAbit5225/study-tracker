@@ -13,6 +13,10 @@
   margin: 0 0 var(--s2);
 }
 
+:root[data-theme='light'] .kicker {
+  color: #8a6408; /* darker mustard: readable on cream */
+}
+
 .muted {
   color: var(--ink-muted);
 }

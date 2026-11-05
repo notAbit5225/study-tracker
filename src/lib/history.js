@@ -14,7 +14,7 @@ async function fetchAllDailyTotals() {
   for (let from = 0; ; from += 1000) {
     const { data, error } = await supabase
       .from('daily_totals')
-      .select('day, subject, seconds')
+      .select('day, subject, seconds, distractions')
       .order('day')
       .range(from, from + 999);
     if (error) throw error;
@@ -27,9 +27,11 @@ export async function loadHistory() {
   const [rows] = await Promise.all([fetchAllDailyTotals(), loadGoals()]);
 
   const totalsByDay = new Map();
+  const distractionsByDay = new Map();
   for (const r of rows) {
     if (!totalsByDay.has(r.day)) totalsByDay.set(r.day, { maths: 0, english: 0, georgian: 0 });
     totalsByDay.get(r.day)[r.subject] = r.seconds / 60;
+    distractionsByDay.set(r.day, (distractionsByDay.get(r.day) ?? 0) + (r.distractions ?? 0));
   }
 
   const history = computeHistory({
@@ -42,6 +44,7 @@ export async function loadHistory() {
   // Not awaited on purpose: the page draws right away, and a celebration
   // (if one is due) pops up on top a moment later.
   checkMilestones(history, celebrate);
+  history.distractionsByDay = distractionsByDay; // used by the stats page
   return history;
 }
 

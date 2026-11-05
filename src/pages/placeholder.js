@@ -1,11 +1,6 @@
 // Pages that don't exist yet. Each one says which phase builds it, so you
 // can see the whole app's shape from day one.
 const PAGES = {
-  stats: {
-    title: 'Stats',
-    phase: 6,
-    line: 'Hours per subject, by day, week, month, or all time.',
-  },
   logbook: {
     title: 'Logbook',
     phase: 6,

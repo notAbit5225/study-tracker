@@ -8,6 +8,7 @@ import './styles/timer.css';
 import './styles/calendar.css';
 import './styles/milestones.css';
 import './styles/fire.css';
+import './styles/stats.css';
 
 import { supabase, isConfigured } from './lib/supabase.js';
 import { ensureDefaults, loadSettings } from './lib/settings.js';
@@ -19,6 +20,7 @@ import * as me from './pages/me.js';
 import { placeholder } from './pages/placeholder.js';
 import * as timerPage from './pages/timer.js';
 import * as calendarPage from './pages/calendar.js';
+import * as statsPage from './pages/stats.js';
 import { startTimerEngine, stopTimerEngine, onTimer } from './lib/timer.js';
 import { closeMiniTimer } from './ui/mini-timer.js';
 import { registerServiceWorker } from './lib/notify.js';
@@ -32,7 +34,7 @@ const routes = {
   today,
   timer: timerPage,
   calendar: calendarPage,
-  stats: placeholder('stats'),
+  stats: statsPage,
   logbook: placeholder('logbook'),
   me,
 };
