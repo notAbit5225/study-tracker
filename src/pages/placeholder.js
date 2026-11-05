@@ -1,11 +1,6 @@
 // Pages that don't exist yet. Each one says which phase builds it, so you
 // can see the whole app's shape from day one.
 const PAGES = {
-  timer: {
-    title: 'Timer',
-    phase: 2,
-    line: 'Pick a subject, hit start, put the phone face down. Coming next.',
-  },
   calendar: {
     title: 'Calendar',
     phase: 4,

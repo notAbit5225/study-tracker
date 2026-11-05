@@ -3,6 +3,9 @@
 // Phone:  a slim top bar + a tab bar along the bottom (thumb-reachable).
 import { getSettings, onSettingsChange } from '../lib/settings.js';
 import { paintAvatar } from './avatar.js';
+import { onTimer, snapshot } from '../lib/timer.js';
+import { subjectLabel } from '../lib/subjects.js';
+import { formatClock } from '../lib/time.js';
 
 export const NAV = [
   { id: 'today', label: 'Today' },
@@ -17,6 +20,8 @@ export function mountShell(root) {
     <div class="shell">
       <aside class="side">
         <a class="wordmark" href="#/today">Desk<span class="wordmark__sub">exam season, vol. 1</span></a>
+
+        <a class="timer-chip" href="#/timer" data-timer-chip hidden></a>
 
         <nav class="tabs" aria-label="Main">
           <ol>
@@ -49,9 +54,26 @@ export function mountShell(root) {
   paint(getSettings());
   const unsubscribe = onSettingsChange(paint);
 
+  // A small chip showing the running timer on every page (hidden when idle,
+  // and on the timer page itself, where it would just repeat the big clock).
+  const chip = root.querySelector('[data-timer-chip]');
+  let page = null;
+  const paintChip = (s) => {
+    chip.hidden = s.status === 'idle' || page === 'timer';
+    if (chip.hidden) return;
+    chip.dataset.subject = s.row.subject;
+    chip.textContent =
+      s.status === 'waiting'
+        ? "rest's over"
+        : `${s.status === 'rest' ? 'rest' : subjectLabel(s.row.subject)} ${s.status === 'paused' ? 'paused' : formatClock(s.remainingMs)}`;
+  };
+  const unsubscribeTimer = onTimer(paintChip);
+
   return {
     outlet: root.querySelector('#outlet'),
     setActive(id) {
+      page = id;
+      paintChip(snapshot());
       root.querySelectorAll('[data-id]').forEach((a) => {
         const on = a.dataset.id === id;
         a.classList.toggle('is-active', on);
@@ -59,6 +81,9 @@ export function mountShell(root) {
         else a.removeAttribute('aria-current');
       });
     },
-    destroy: unsubscribe,
+    destroy() {
+      unsubscribe();
+      unsubscribeTimer();
+    },
   };
 }

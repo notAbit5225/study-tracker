@@ -1,0 +1,449 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Timer page, sidebar chip, and the floating mini timer.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* each subject has a colour, used as --sub wherever a subject appears */
+.run--maths,
+.pick__opt--maths,
+[data-subject='maths'] {
+  --sub: var(--c-maths);
+}
+.run--english,
+.pick__opt--english,
+[data-subject='english'] {
+  --sub: var(--c-english);
+}
+.run--georgian,
+.pick__opt--georgian,
+[data-subject='georgian'] {
+  --sub: var(--c-georgian);
+}
+.run--rest {
+  --sub: var(--cream-dim);
+}
+
+.chip {
+  border: 1.5px solid var(--line);
+  background: transparent;
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+
+.chip:hover {
+  border-color: var(--mustard);
+}
+
+.chip:active {
+  background: var(--surface-2);
+}
+
+.btn--big {
+  font-size: 1.1rem;
+  padding: 0.85rem 2rem;
+}
+
+/* ── setup ───────────────────────────────────────────────────────────────── */
+
+.setup {
+  display: grid;
+  gap: var(--s6);
+  max-width: 32rem;
+}
+
+.setup .btn--big {
+  justify-self: start;
+}
+
+/* subject picker: three tabs like the coloured dividers in a binder */
+.pick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+
+.pick__opt {
+  position: relative;
+  cursor: pointer;
+}
+
+.pick__opt input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pick__opt span {
+  display: block;
+  padding: 0.65rem 1.2rem 0.6rem;
+  border: 1.5px solid var(--line);
+  border-bottom: 4px solid var(--sub);
+  border-radius: 8px 8px 3px 3px;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--ink-muted);
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.pick__opt:hover span {
+  color: var(--ink);
+}
+
+.pick__opt input:checked + span {
+  background: var(--sub);
+  border-color: var(--sub);
+  color: var(--espresso);
+  transform: translateY(-3px);
+}
+
+.pick__opt input:focus-visible + span {
+  outline: 2px dashed var(--mustard-bright);
+  outline-offset: 3px;
+}
+
+.len {
+  display: grid;
+  gap: var(--s2);
+}
+
+.len__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  color: var(--ink-muted);
+}
+
+.len__top output {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--ink);
+}
+
+.len__quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+
+/* range slider: a thin rule with a mustard knob */
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 2rem;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type='range']::-webkit-slider-runnable-track {
+  height: 3px;
+  background: var(--line);
+  border-radius: 2px;
+}
+
+input[type='range']::-moz-range-track {
+  height: 3px;
+  background: var(--line);
+  border-radius: 2px;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 1.3rem;
+  height: 1.3rem;
+  margin-top: -0.55rem;
+  border-radius: 50%;
+  background: var(--mustard-bright);
+  border: 3px solid var(--bg);
+  box-shadow: 0 0 0 1.5px var(--mustard-bright);
+}
+
+input[type='range']::-moz-range-thumb {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  background: var(--mustard-bright);
+  border: 3px solid var(--bg);
+}
+
+/* ── running timer ───────────────────────────────────────────────────────── */
+
+.run {
+  display: grid;
+  gap: var(--s4);
+  max-width: 36rem;
+}
+
+.run__label {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--sub);
+}
+
+.run__label span {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-left: var(--s2);
+}
+
+.run__clock {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(4.5rem, 22vw, 9rem);
+  line-height: 0.95;
+  font-variant-numeric: tabular-nums; /* digits don't jiggle as they change */
+  letter-spacing: -0.02em;
+}
+
+.is-paused .run__clock {
+  opacity: 0.45;
+  animation: breathe 2.6s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* progress as a ruler: tick marks with a fill sliding across */
+.ruler {
+  --p: 0;
+  position: relative;
+  height: 14px;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--line) 0 1px,
+    transparent 1px 10%
+  );
+  border-bottom: 1.5px solid var(--line);
+}
+
+.ruler__fill {
+  position: absolute;
+  left: 0;
+  bottom: -1.5px;
+  height: 5px;
+  width: calc(var(--p) * 100%);
+  background: var(--sub);
+  border-radius: 0 3px 3px 0;
+  transition: width 900ms linear;
+}
+
+.run__meta {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.95rem;
+}
+
+.run__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s4) var(--s5);
+  margin-top: var(--s3);
+}
+
+.add {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+}
+
+/* the distraction button: deliberately a different shape from everything else */
+.distract {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3);
+  margin-top: var(--s4);
+  padding-top: var(--s4);
+  border-top: 1px dashed var(--line);
+}
+
+.distract__btn {
+  border: 1.5px dashed var(--rust);
+  background: transparent;
+  color: var(--rust);
+  padding: 0.6rem 1.1rem;
+  border-radius: 4px 14px 4px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 140ms ease;
+}
+
+:root[data-theme='light'] .distract__btn {
+  color: var(--rust-deep);
+  border-color: var(--rust-deep);
+}
+
+.distract__btn:active {
+  background: rgba(192, 101, 42, 0.15);
+  transform: scale(0.97);
+}
+
+.distract__count {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  min-width: 2ch;
+}
+
+.distract__count.wiggle {
+  animation: wiggle 420ms ease;
+}
+
+@keyframes wiggle {
+  25% {
+    transform: rotate(-9deg) scale(1.15);
+  }
+  60% {
+    transform: rotate(6deg);
+  }
+}
+
+.distract__key {
+  margin: 0;
+}
+
+@media (hover: none) {
+  .distract__key {
+    display: none; /* no keyboard on a phone */
+  }
+}
+
+.run__end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3) var(--s5);
+}
+
+.confirm {
+  margin: 0;
+  flex-basis: 100%;
+}
+
+/* ── waiting + summary ───────────────────────────────────────────────────── */
+
+.waiting,
+.summary {
+  display: grid;
+  gap: var(--s4);
+  max-width: 32rem;
+  justify-items: start;
+}
+
+.waiting h1,
+.summary h1 {
+  margin: 0;
+}
+
+.waiting > p,
+.summary > p {
+  margin: 0;
+}
+
+.waiting__go {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s4);
+  margin-top: var(--s3);
+}
+
+.today-so-far {
+  width: 100%;
+  max-width: 20rem;
+  margin-bottom: var(--s4);
+}
+
+.flash {
+  margin-bottom: var(--s4);
+}
+
+/* ── chip in the sidebar / top bar ───────────────────────────────────────── */
+
+.timer-chip {
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+  color: var(--ink);
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--sub, var(--line));
+  white-space: nowrap;
+}
+
+@media (min-width: 860px) {
+  .timer-chip {
+    align-self: flex-start;
+    margin-top: calc(var(--s5) * -1);
+  }
+}
+
+/* ── the floating mini timer window ──────────────────────────────────────── */
+
+body.mini {
+  padding: 0.8rem 1rem;
+  display: grid;
+  align-content: center;
+  gap: 0.35rem;
+  min-height: 100vh;
+  border-top: 4px solid var(--sub, var(--mustard));
+}
+
+.mini__label {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sub, var(--ink-muted));
+}
+
+.mini__clock {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 2.9rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.mini__row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+}
+
+.distract__btn--small {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.85rem;
+}
+
+/* rest slider greys out when the study block is too short to earn a rest */
+.len.is-off input,
+.len.is-off .len__top {
+  opacity: 0.35;
+}
+
+.len .hint {
+  margin: 0;
+}
+
+.run__restnote {
+  margin: calc(var(--s3) * -1) 0 0;
+}

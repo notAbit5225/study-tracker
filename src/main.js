@@ -4,6 +4,7 @@
 import './styles/tokens.css';
 import './styles/base.css';
 import './styles/app.css';
+import './styles/timer.css';
 
 import { supabase, isConfigured } from './lib/supabase.js';
 import { ensureDefaults, loadSettings } from './lib/settings.js';
@@ -13,12 +14,19 @@ import { renderLogin } from './pages/login.js';
 import * as today from './pages/today.js';
 import * as me from './pages/me.js';
 import { placeholder } from './pages/placeholder.js';
+import * as timerPage from './pages/timer.js';
+import { startTimerEngine, stopTimerEngine, onTimer } from './lib/timer.js';
+import { closeMiniTimer } from './ui/mini-timer.js';
+import { registerServiceWorker } from './lib/notify.js';
+import { unlockAudio } from './lib/sound.js';
+import { subjectLabel } from './lib/subjects.js';
+import { formatClock } from './lib/time.js';
 
 const root = document.querySelector('#app');
 
 const routes = {
   today,
-  timer: placeholder('timer'),
+  timer: timerPage,
   calendar: placeholder('calendar'),
   stats: placeholder('stats'),
   logbook: placeholder('logbook'),
@@ -45,6 +53,7 @@ async function show(session) {
   try {
     await ensureDefaults(userId);
     await loadSettings();
+    await startTimerEngine(userId);
   } catch (err) {
     console.error(err);
     root.innerHTML = `<p class="boot">Couldn't load your stuff. Refresh to try again.</p>`;
@@ -58,11 +67,30 @@ async function show(session) {
     outlet: shell.outlet,
     onChange: shell.setActive,
   });
+  const stopTitle = onTimer(updateTitle);
   teardown = () => {
     stopRouter();
     shell.destroy();
+    stopTitle();
+    closeMiniTimer();
+    stopTimerEngine();
   };
 }
+
+// The browser tab's title doubles as a tiny timer: "42:17 · Maths".
+function updateTitle(s) {
+  if (s.status === 'idle') document.title = 'Desk';
+  else if (s.status === 'waiting') document.title = "Rest's over · Desk";
+  else if (s.status === 'paused') document.title = `Paused · ${subjectLabel(s.row.subject)}`;
+  else if (s.status === 'rest') document.title = `${formatClock(s.remainingMs)} · rest`;
+  else document.title = `${formatClock(s.remainingMs)} · ${subjectLabel(s.row.subject)}`;
+}
+
+// Sound is only allowed after a tap/click on the page, so unlock it on the
+// first one. (After a refresh, the chime works again once you've tapped.)
+document.addEventListener('pointerdown', unlockAudio, { once: true });
+document.addEventListener('keydown', unlockAudio, { once: true });
+registerServiceWorker();
 
 if (!isConfigured) {
   root.innerHTML = '<p class="boot">Fill in src/config.js first.</p>';
