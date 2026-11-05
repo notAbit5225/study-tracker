@@ -21,6 +21,7 @@ import { placeholder } from './pages/placeholder.js';
 import * as timerPage from './pages/timer.js';
 import * as calendarPage from './pages/calendar.js';
 import * as statsPage from './pages/stats.js';
+import * as reviewPage from './pages/review.js';
 import { startTimerEngine, stopTimerEngine, onTimer } from './lib/timer.js';
 import { closeMiniTimer } from './ui/mini-timer.js';
 import { registerServiceWorker } from './lib/notify.js';
@@ -37,6 +38,7 @@ const routes = {
   stats: statsPage,
   logbook: placeholder('logbook'),
   me,
+  review: reviewPage,
 };
 
 let teardown = null; // undoes whatever screen is currently showing

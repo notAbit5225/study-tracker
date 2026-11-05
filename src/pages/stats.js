@@ -211,6 +211,8 @@ export function render(view) {
         ${compare}
       </section>
 
+      <a class="side-link" href="#/review">Weekly reviews <span>→</span></a>
+
       ${
         kind !== 'day' && best && best.t > 0
           ? `<section class="side-tile">

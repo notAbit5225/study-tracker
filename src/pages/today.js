@@ -11,6 +11,7 @@ import { onTimer } from '../lib/timer.js';
 import { progressHTML } from '../ui/progress.js';
 import { countdownHTML } from '../ui/countdown.js';
 import { tbilisiDay } from '../lib/time.js';
+import { pendingReview } from '../lib/reviews.js';
 
 function greeting() {
   // The hour in Tbilisi, not on the device clock.
@@ -51,6 +52,8 @@ export function render(view) {
           <p class="kicker">${esc(prettyDate())}</p>
           <h1>${greeting()}, ${esc(s.display_name)}.</h1>
         </header>
+
+        <div data-review></div>
 
         <section class="today__progress" data-progress>
           <p class="muted">adding it up…</p>
@@ -101,6 +104,19 @@ export function render(view) {
   });
 
   enableFirePreview(view);
+  // Sunday (or a skipped Sunday): nudge toward the weekly review
+  pendingReview(tbilisiDay(), getSettings().tracking_start)
+    .then((p) => {
+      if (!p) return;
+      view.querySelector('[data-review]').innerHTML = `
+        <a class="review-nudge" href="#/review">
+          <span class="review-nudge__k">weekly review</span>
+          <span>${p.sunday ? "It's Sunday. Two minutes for your weekly review." : "You skipped last Sunday's review. Want to do it now?"}</span>
+          <span class="review-nudge__go">open</span>
+        </a>`;
+    })
+    .catch((err) => console.error(err));
+
   refresh();
   return unsubscribe;
 }
