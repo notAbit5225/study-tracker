@@ -70,3 +70,9 @@ select {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Make the `hidden` attribute always win, even over classes like .btn that
+   set their own display value. */
+[hidden] {
+  display: none !important;
+}

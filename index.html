@@ -6,6 +6,15 @@
     <meta name="theme-color" content="#221810" />
     <title>Desk</title>
 
+    <!-- Runs before anything is drawn, so a cream-mode user never sees a flash
+         of dark (or vice versa). The real value comes from settings later. -->
+    <script>
+      try {
+        var t = localStorage.getItem('desk-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
+
     <!-- Fonts:
          Young Serif  – warm old-style serif for headings and the big timer digits
          Figtree      – clean, readable body text

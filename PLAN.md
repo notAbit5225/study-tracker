@@ -9,9 +9,9 @@ All days follow **Asia/Tbilisi**; weeks start on **Monday**.
 | # | Phase | Contents |
 |---|-------|----------|
 | 0 | Setup | Vite project, Supabase tables + RLS + storage, GitHub Pages deploy |
-| 1 | Access | Password-only login, stay logged in, settings: name, avatar (jpg/png/webp ≤ 2 MB, circle, initial fallback), theme |
-| 2 | Timer | Subject, study 30 min–4 h, rest 5–10 min, pause/resume, survives refresh (DB timestamps), sound + notification, focus mode, distraction button, stops after rest and waits for "next round" |
-| 3 | Goals & progress | Per-subject targets (versioned), streak minimum, today's progress bars, post-session note |
+| 1 | Access | Email + password login (once per device), stay logged in, app layout + navigation, settings: name, avatar (jpg/png/webp ≤ 2 MB, circle, initial fallback), theme |
+| 2 | Timer | Subject, study length 30 min–4 h to start, **+ add time anytime (no upper limit)**, **finish early anytime (all time counts)**, rest 5–10 min, pause/resume, survives refresh (DB timestamps), sound + notification, focus mode, distraction button, stops after rest and waits for "next round" |
+| 3 | Goals & progress | Per-subject targets (versioned; default Maths 3h, English 1h30m, Georgian 2h), streak minimum (**default 1 h total**, editable) keeps the streak, all three targets = "full day", today's progress bars, post-session note |
 | 4 | Calendar & streak | Month view (minimum / full / skip / missed), streak counter, auto skip day (1 per rolling 14 days), "next skip available" |
 | 5 | Milestones | 10, 30, 50, 100, 150, 200 days: each with its own small animation + message; "milestones earned" in profile |
 | 6 | Extras | Exam countdown (3 dates, next one highlighted), **stats page (below)**, Sunday weekly review, topic checklist, maths mistake log with photos, PWA install |
