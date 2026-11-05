@@ -1,8 +1,12 @@
-// Today. In Phase 1 it's just a greeting and the plan for the page; progress
-// bars, streak and countdown move in over the next phases.
+// Today: greeting, today's progress per subject, and a way into the timer.
+// Streak (phase 4) and exam countdown (phase 6) join later.
 import { getSettings } from '../lib/settings.js';
 import { esc } from '../lib/html.js';
 import { TIMEZONE } from '../config.js';
+import { totalsForDay } from '../lib/sessions.js';
+import { loadGoals, goalsOn } from '../lib/goals.js';
+import { onTimer } from '../lib/timer.js';
+import { progressHTML } from '../ui/progress.js';
 
 function greeting() {
   // The hour in Tbilisi, not on the device clock.
@@ -24,20 +28,62 @@ function prettyDate() {
 export function render(view) {
   const s = getSettings();
   view.innerHTML = `
-    <header class="page-head page-head--today">
-      <p class="kicker">${esc(prettyDate())}</p>
-      <h1>${greeting()}, ${esc(s.display_name)}.</h1>
-    </header>
+    <div class="today">
+      <div class="today__main">
+        <header class="page-head page-head--today">
+          <p class="kicker">${esc(prettyDate())}</p>
+          <h1>${greeting()}, ${esc(s.display_name)}.</h1>
+        </header>
 
-    <section class="note-sheet">
-      <h2>What lives here soon</h2>
-      <ul class="ruled">
-        <li><span>today's bars for maths, english, georgian</span><em>phase 3</em></li>
-        <li><span>your streak</span><em>phase 4</em></li>
-        <li><span>days until each exam</span><em>phase 6</em></li>
-      </ul>
-    </section>
+        <section class="today__progress" data-progress>
+          <p class="muted">adding it up…</p>
+        </section>
 
-    <a class="btn btn--primary today__start" href="#/timer">Start studying</a>
+        <div class="today__go" data-go></div>
+      </div>
+
+      <!-- Right-hand column on wide screens: streak (phase 4) and exam
+           countdown (phase 6) move in here, so the page grows sideways
+           instead of getting longer. -->
+      <aside class="today__side">
+        <section class="note-sheet today__soon">
+          <h2>Coming soon</h2>
+          <ul class="ruled">
+            <li><span>your streak</span><em>phase 4</em></li>
+            <li><span>days until each exam</span><em>phase 6</em></li>
+          </ul>
+        </section>
+      </aside>
+    </div>
   `;
+
+  const progressEl = view.querySelector('[data-progress]');
+  const goEl = view.querySelector('[data-go]');
+
+  async function refresh() {
+    try {
+      const [totals] = await Promise.all([totalsForDay(), loadGoals()]);
+      progressEl.innerHTML = progressHTML(totals, goalsOn());
+    } catch (err) {
+      console.error(err);
+      progressEl.innerHTML = `<p class="form-error">Couldn't load today's numbers. Refresh?</p>`;
+    }
+  }
+
+  // Redo the numbers whenever the timer changes state (e.g. a block just
+  // got saved), and swap the button between "start" and "back to it".
+  let lastStatus = null;
+  const unsubscribe = onTimer((t) => {
+    if (t.status === lastStatus) return;
+    const first = lastStatus === null;
+    lastStatus = t.status;
+    goEl.innerHTML =
+      t.status === 'idle'
+        ? `<a class="btn btn--primary" href="#/timer">Start studying</a>`
+        : `<a class="btn btn--quiet" href="#/timer">Back to the timer</a>`;
+    if (!first) refresh();
+  });
+
+  refresh();
+  return unsubscribe;
 }

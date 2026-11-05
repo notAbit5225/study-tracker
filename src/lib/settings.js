@@ -28,34 +28,28 @@ function set(next) {
 }
 
 // First login on a brand-new account: create the settings row and the
-// default daily targets. Safe to run every time – it only adds what's missing,
-// and `ignoreDuplicates` means two devices logging in at once can't clash.
+// default goals. Safe to run every time – it only adds what's missing, and
+// `ignoreDuplicates` means two devices logging in at once can't clash.
 export async function ensureDefaults(userId) {
   const { error: sErr } = await supabase
     .from('settings')
-    .upsert(
-      { user_id: userId, streak_min_minutes: DEFAULT_STREAK_MIN },
-      { onConflict: 'user_id', ignoreDuplicates: true },
-    );
+    .upsert({ user_id: userId }, { onConflict: 'user_id', ignoreDuplicates: true });
   if (sErr) throw sErr;
 
-  // head: true = "just count, don't send me the rows"
-  const { count, error: cErr } = await supabase
-    .from('goal_versions')
-    .select('id', { count: 'exact', head: true });
-  if (cErr) throw cErr;
+  const { data: have, error: gErr } = await supabase.from('goal_versions').select('subject');
+  if (gErr) throw gErr;
+  const present = new Set(have.map((r) => r.subject));
 
-  if (count === 0) {
-    const today = tbilisiDay();
-    const rows = Object.entries(DEFAULT_TARGETS).map(([subject, daily_minutes]) => ({
-      user_id: userId,
-      subject,
-      daily_minutes,
-      effective_from: today,
-    }));
+  const defaults = { ...DEFAULT_TARGETS, streak_min: DEFAULT_STREAK_MIN };
+  const today = tbilisiDay();
+  const missing = Object.entries(defaults)
+    .filter(([kind]) => !present.has(kind))
+    .map(([subject, daily_minutes]) => ({ user_id: userId, subject, daily_minutes, effective_from: today }));
+
+  if (missing.length) {
     const { error } = await supabase
       .from('goal_versions')
-      .upsert(rows, { onConflict: 'user_id,subject,effective_from', ignoreDuplicates: true });
+      .upsert(missing, { onConflict: 'user_id,subject,effective_from', ignoreDuplicates: true });
     if (error) throw error;
   }
 }

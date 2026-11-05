@@ -1,10 +1,11 @@
-// You: name, profile picture, theme, log out. Targets, streak minimum, exam
-// dates and milestones join this page in later phases.
+// You: name, profile picture, daily goals, theme, log out. Exam dates and
+// milestones join this page in later phases.
 import { getSettings, updateSettings, onSettingsChange } from '../lib/settings.js';
 import { uploadAvatar, removeAvatar, checkFile } from '../lib/avatar.js';
 import { supabase } from '../lib/supabase.js';
 import { esc } from '../lib/html.js';
 import { paintAvatar } from '../ui/avatar.js';
+import { loadGoals, goalsOn, saveGoals } from '../lib/goals.js';
 
 export function render(view) {
   const s = getSettings();
@@ -15,6 +16,7 @@ export function render(view) {
     </header>
 
     <div class="me">
+      <div class="me__col me__col--profile">
       <section class="me__id">
         <div class="me__portrait">
           <span class="avatar avatar--xl" data-avatar></span>
@@ -47,14 +49,28 @@ export function render(view) {
         </div>
       </section>
 
+      <section class="me__device">
+        <button class="btn btn--link" type="button" data-logout>Log out on this device</button>
+      </section>
+      </div>
+
+      <div class="me__col me__col--goals">
+      <form class="me__goals" data-goals>
+        <h2>Daily goals</h2>
+        <p class="hint">Changes count from today. Past days keep the goals they had.</p>
+        <div class="goals" data-goal-rows><p class="muted">loading…</p></div>
+        <div class="me__goals-save">
+          <button class="btn btn--primary" type="submit">Save goals</button>
+          <span class="saved" data-goals-saved hidden>saved</span>
+          <p class="form-error" role="alert" data-goals-error hidden></p>
+        </div>
+      </form>
+
       <section class="me__later">
         <h2>Milestones</h2>
         <p class="muted">None yet. The first one's at 10 days.</p>
       </section>
-
-      <section class="me__device">
-        <button class="btn btn--link" type="button" data-logout>Log out on this device</button>
-      </section>
+      </div>
     </div>
   `;
 
@@ -113,6 +129,66 @@ export function render(view) {
     saved.classList.remove('pop');
     void saved.offsetWidth; // restart the CSS animation
     saved.classList.add('pop');
+  });
+
+  // ── goals ─────────────────────────────────────────────────────────────────
+  // Each goal is shown as hours + minutes, and stored as total minutes.
+  const goalsForm = $('[data-goals]');
+  const goalRows = $('[data-goal-rows]');
+  const GOAL_ROWS = [
+    { kind: 'maths', label: 'Maths' },
+    { kind: 'english', label: 'English' },
+    { kind: 'georgian', label: 'Georgian' },
+    { kind: 'streak_min', label: 'Streak minimum', sub: 'total, any subjects' },
+  ];
+
+  loadGoals()
+    .then(() => {
+      const g = goalsOn();
+      goalRows.innerHTML = GOAL_ROWS.map(
+        (r) => `
+        <div class="goal-row ${r.kind === 'streak_min' ? 'goal-row--min' : ''}" data-subject="${r.kind}">
+          <span class="goal-row__name">${r.label}${r.sub ? `<small>${r.sub}</small>` : ''}</span>
+          <label class="goal-row__num"><input type="number" name="${r.kind}-h" min="0" max="12" value="${Math.floor(g[r.kind] / 60)}" inputmode="numeric" /> h</label>
+          <label class="goal-row__num"><input type="number" name="${r.kind}-m" min="0" max="55" step="5" value="${g[r.kind] % 60}" inputmode="numeric" /> m</label>
+        </div>`,
+      ).join('');
+    })
+    .catch((err) => {
+      console.error(err);
+      goalRows.innerHTML = `<p class="form-error">Couldn't load your goals. Refresh?</p>`;
+    });
+
+  goalsForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const err = $('[data-goals-error]');
+    err.hidden = true;
+
+    const goals = {};
+    for (const r of GOAL_ROWS) {
+      const h = Number(goalsForm[`${r.kind}-h`].value) || 0;
+      const m = Number(goalsForm[`${r.kind}-m`].value) || 0;
+      goals[r.kind] = Math.round(h * 60 + m);
+    }
+    if (goals.streak_min < 5) return showErr('Streak minimum needs to be at least 5 minutes.');
+    if (Object.values(goals).some((v) => v < 0 || v > 720)) return showErr('Keep each goal between 0 and 12 hours.');
+
+    try {
+      await saveGoals(goals);
+      const saved = $('[data-goals-saved]');
+      saved.hidden = false;
+      saved.classList.remove('pop');
+      void saved.offsetWidth;
+      saved.classList.add('pop');
+    } catch (e2) {
+      console.error(e2);
+      showErr("Didn't save. Try again?");
+    }
+
+    function showErr(msg) {
+      err.textContent = msg;
+      err.hidden = false;
+    }
   });
 
   // ── theme ─────────────────────────────────────────────────────────────────

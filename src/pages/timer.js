@@ -10,6 +10,10 @@ import { askNotificationPermission } from '../lib/notify.js';
 import { unlockAudio } from '../lib/sound.js';
 import { openMiniTimer, miniTimerSupported } from '../ui/mini-timer.js';
 import { TIMEZONE } from '../config.js';
+import { totalsForDay } from '../lib/sessions.js';
+import { loadGoals, goalsOn } from '../lib/goals.js';
+import { progressHTML } from '../ui/progress.js';
+import { mountNote } from '../ui/note.js';
 
 const PREFS_KEY = 'desk-timer-prefs';
 const clockTime = new Intl.DateTimeFormat('en-GB', { timeZone: TIMEZONE, hour: '2-digit', minute: '2-digit' });
@@ -136,7 +140,8 @@ export function render(view) {
           <button class="btn btn--link" data-action="done">done for now</button>
           ${miniTimerSupported ? '<button class="btn btn--link" data-action="popout">pop out mini timer</button>' : ''}
         </div>
-      </section>`;
+      </section>
+      <div class="after after--rest" data-after></div>`;
   }
 
   function waitingHTML(s) {
@@ -153,22 +158,16 @@ export function render(view) {
   }
 
   function summaryHTML() {
-    const { saved, totals } = summary;
+    const { saved } = summary;
     const head = saved
       ? saved.minutes >= 1
         ? `<p class="kicker">saved</p><h1>${formatMinutes(saved.minutes)} of ${subjectLabel(saved.subject).toLowerCase()}.</h1>`
         : `<p class="kicker">not saved</p><h1>Under a minute, so I didn't keep it.</h1>`
       : `<p class="kicker">all saved</p><h1>Good stretch.</h1>`;
-    const today = totals
-      ? `<ul class="ruled today-so-far">
-          ${SUBJECTS.map((s) => `<li><span>${s.label}</span><em>${formatMinutes(totals[s.id])}</em></li>`).join('')}
-         </ul>`
-      : '';
     return `
       <section class="summary">
         ${head}
-        <p class="muted">Today so far:</p>
-        ${today}
+        <div class="after" data-after></div>
         <button class="btn btn--primary" data-action="again">Another one</button>
       </section>`;
   }
@@ -199,6 +198,9 @@ export function render(view) {
       else if (s.status === 'study' || s.status === 'paused') view.innerHTML = studyHTML(s);
       else if (s.status === 'rest') view.innerHTML = restHTML(s);
       else view.innerHTML = waitingHTML(s);
+
+      const after = view.querySelector('[data-after]');
+      if (after) fillAfterSession(after);
     }
     update(s);
   }
@@ -251,15 +253,22 @@ export function render(view) {
     el.textContent = msg;
   }
 
-  async function showSummary(saved) {
-    summary = { saved, totals: null };
+  function showSummary(saved) {
+    summary = { saved };
+    drawnKey = null;
     draw(timer.snapshot());
+  }
+
+  // Today's bars + the "what did you study?" note for the block just saved.
+  async function fillAfterSession(el) {
+    el.innerHTML = '<p class="muted">adding it up…</p>';
     try {
-      summary.totals = await timer.todayTotals();
-      drawnKey = null;
-      draw(timer.snapshot());
+      const [totals] = await Promise.all([totalsForDay(), loadGoals()]);
+      el.innerHTML = `<h2 class="after__title">Today so far</h2>${progressHTML(totals, goalsOn())}<div data-note-slot></div>`;
+      await mountNote(el.querySelector('[data-note-slot]'));
     } catch (err) {
       console.error(err);
+      el.innerHTML = '';
     }
   }
 
@@ -336,8 +345,9 @@ export function render(view) {
   });
 
   view.addEventListener('submit', (e) => {
-    e.preventDefault();
     const form = e.target;
+    if (!form.matches('[data-setup]')) return; // e.g. the note form handles itself
+    e.preventDefault();
     const prefs = {
       subject: form.subject.value,
       study: Number(form.study.value),

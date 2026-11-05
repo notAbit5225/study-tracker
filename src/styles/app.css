@@ -633,3 +633,397 @@
     padding: var(--s7) var(--s6) var(--s7) clamp(var(--s6), 6vw, 7rem);
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Phase 3: progress bars, verdict, note, goals editor
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.bar--maths,
+.goal-row[data-subject='maths'] {
+  --sub: var(--c-maths);
+}
+.bar--english,
+.goal-row[data-subject='english'] {
+  --sub: var(--c-english);
+}
+.bar--georgian,
+.goal-row[data-subject='georgian'] {
+  --sub: var(--c-georgian);
+}
+
+.progress {
+  max-width: 34rem;
+}
+
+.bars {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s5);
+}
+
+.bar__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--s3);
+  margin-bottom: var(--s2);
+}
+
+.bar__name {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--sub);
+}
+
+.bar__nums {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.bar__nums span {
+  color: var(--ink-muted);
+  font-weight: 400;
+}
+
+/* a thick, slightly uneven pencil-stroke track */
+.bar__track {
+  position: relative;
+  height: 12px;
+  background: var(--surface);
+  border-radius: 6px 3px 7px 4px;
+  overflow: hidden;
+}
+
+.bar__fill {
+  --p: 0;
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--p) * 100%);
+  background: var(--sub);
+  border-radius: inherit;
+  transform-origin: left;
+  animation: fill-in 900ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes fill-in {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* a finished subject gets diagonal hatching, like it's been shaded in */
+.bar.is-hit .bar__fill {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0 5px,
+    rgba(0, 0, 0, 0.13) 5px 7px
+  );
+  background-color: var(--sub);
+}
+
+.bar__left {
+  margin: var(--s1) 0 0;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.bar.is-hit .bar__left {
+  color: var(--sub);
+  font-weight: 600;
+}
+
+.progress__foot {
+  margin-top: var(--s5);
+  padding-top: var(--s4);
+  border-top: 1px dashed var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--s2) var(--s5);
+  align-items: baseline;
+}
+
+.progress__total {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+.verdict {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.92rem;
+}
+
+.verdict--min {
+  color: var(--mustard-bright);
+}
+
+:root[data-theme='light'] .verdict--min {
+  color: #8a6408; /* darker mustard: readable on cream */
+}
+
+.verdict--full {
+  color: var(--ink);
+  font-weight: 600;
+  padding: 0.15rem 0.6rem;
+  background: var(--mustard);
+  color: var(--espresso);
+  border-radius: 3px;
+  transform: rotate(-1deg);
+}
+
+/* Today page */
+.today__progress {
+  margin-bottom: var(--s5);
+}
+
+.today__go {
+  margin-bottom: var(--s7);
+}
+
+.today__soon {
+  max-width: 24rem;
+}
+
+/* after a study block (rest screen + saved screen) */
+.after {
+  width: 100%;
+  margin: var(--s4) 0 var(--s5);
+}
+
+.after--rest {
+  margin-top: var(--s7);
+  padding-top: var(--s5);
+  border-top: 1px dashed var(--line);
+  max-width: 36rem;
+}
+
+.after__title {
+  font-size: 1.2rem;
+  margin-bottom: var(--s4);
+}
+
+/* "what did you study?" — a lined note card */
+.note {
+  margin-top: var(--s6);
+  display: grid;
+  gap: var(--s2);
+  max-width: 34rem;
+}
+
+.note__label {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+.note__label span {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  margin-left: var(--s2);
+}
+
+.note textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 4.8rem;
+  padding: 0 0.6rem; /* no top padding, so text sits on the ruled lines */
+  border: 0;
+  border-left: 2px solid var(--rust);
+  border-radius: 0;
+  background-color: var(--surface);
+  /* ruled lines that scroll with the text */
+  background-image: linear-gradient(transparent calc(1.6rem - 1px), var(--line) calc(1.6rem - 1px));
+  background-size: 100% 1.6rem;
+  background-attachment: local;
+  line-height: 1.6rem;
+  font-size: 1rem;
+}
+
+.note textarea:focus {
+  outline: none;
+  border-left-color: var(--mustard-bright);
+}
+
+.note__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3);
+}
+
+.note__row .form-error {
+  margin: 0;
+}
+
+/* goals editor on the You page */
+.goals {
+  display: grid;
+  gap: var(--s3);
+  margin: var(--s4) 0;
+  max-width: 28rem;
+}
+
+.goal-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: var(--s3);
+  padding-left: var(--s3);
+  border-left: 3px solid var(--sub, var(--line));
+}
+
+.goal-row--min {
+  margin-top: var(--s3);
+  padding-top: var(--s3);
+  border-left-style: dashed;
+  border-left-color: var(--ink-muted);
+}
+
+.goal-row__name {
+  display: grid;
+}
+
+.goal-row__name small {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+}
+
+.goal-row__num {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+}
+
+.goal-row__num input {
+  width: 3.4rem;
+  padding: 0.35rem 0.3rem;
+  text-align: center;
+  background: var(--surface);
+  border: 1.5px solid transparent;
+  border-bottom-color: var(--line);
+  border-radius: 4px 4px 0 0;
+  font-variant-numeric: tabular-nums;
+  font-size: 1rem;
+}
+
+.goal-row__num input:focus {
+  outline: none;
+  border-bottom-color: var(--mustard-bright);
+}
+
+.me__goals-save {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3);
+}
+
+.me__goals-save .form-error {
+  margin: 0;
+  flex-basis: 100%;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Wide screens: use the right-hand side instead of one long column.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Phone: the two "You" columns melt into one list (display: contents removes
+   the wrapper box), and `order` puts log-out last. */
+.me__col {
+  display: contents;
+}
+.me__id { order: 1; }
+.me__name { order: 2; }
+.me__goals { order: 3; }
+.me__look { order: 4; }
+.me__later { order: 5; }
+.me__device { order: 6; }
+
+.today__side {
+  display: grid;
+  gap: var(--s5);
+  align-content: start;
+}
+
+@media (min-width: 1100px) {
+  .outlet {
+    max-width: 82rem;
+  }
+
+  /* Today: a wide main column and a narrower side column. The side column
+     starts lower than the greeting, which keeps it from looking like a grid
+     of identical boxes. */
+  .today {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(17rem, 1fr);
+    gap: var(--s6) clamp(var(--s6), 5vw, 6rem);
+    align-items: start;
+  }
+
+  .today__side {
+    margin-top: 7.5rem;
+  }
+
+  .today__go {
+    margin-bottom: 0;
+  }
+
+  /* You: profile on the left, goals + milestones on the right */
+  .me {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: var(--s6) clamp(var(--s6), 5vw, 6rem);
+    align-items: start;
+  }
+
+  .me__col {
+    display: grid;
+    gap: var(--s6);
+    align-content: start;
+  }
+
+  /* the goals get their own ledger-like panel so the right side has weight */
+  .me__col--goals .me__goals {
+    background: var(--surface);
+    padding: var(--s5) var(--s5) var(--s5) var(--s5);
+    border-radius: 3px 12px 3px 3px;
+    border-top: 4px solid var(--mustard);
+  }
+
+  .me__col--goals .goals {
+    max-width: none;
+  }
+
+  .me__col--goals .goal-row__num input {
+    background: var(--bg);
+  }
+
+  /* Timer rest screen: countdown left, today's bars + note right */
+  .view--timer:has(> .after--rest) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 1fr);
+    gap: var(--s6) clamp(var(--s6), 5vw, 6rem);
+    align-items: start;
+  }
+
+  .view--timer:has(> .after--rest) > .flash {
+    grid-column: 1 / -1;
+  }
+
+  .after--rest {
+    margin-top: 0;
+    padding-top: 0;
+    padding-left: clamp(var(--s5), 3vw, var(--s6));
+    border-top: 0;
+    border-left: 1px dashed var(--line);
+  }
+
+  .after--rest .note {
+    margin-top: var(--s5);
+  }
+}

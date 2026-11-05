@@ -346,15 +346,3 @@ export async function stop() {
   row = null;
   emit();
 }
-
-// Minutes studied today per subject (used on the "done" screen).
-export async function todayTotals() {
-  const { data, error } = await supabase
-    .from('study_sessions')
-    .select('subject, focused_seconds')
-    .eq('day', tbilisiDay());
-  if (error) throw error;
-  const totals = { maths: 0, english: 0, georgian: 0 };
-  data.forEach((r) => (totals[r.subject] += r.focused_seconds / 60));
-  return totals;
-}
