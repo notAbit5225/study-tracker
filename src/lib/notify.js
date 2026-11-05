@@ -34,6 +34,6 @@ export async function notify(title, body) {
     tag: 'desk-timer', // a new one replaces the old one instead of stacking
     renotify: true,
     silent: true, // our own chime is the sound
-    icon: `${import.meta.env.BASE_URL}icon-192.png`,
+    icon: `${import.meta.env.BASE_URL}icon-192-v2.png`,
   });
 }

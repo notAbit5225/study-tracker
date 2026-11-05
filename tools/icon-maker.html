@@ -1,0 +1,96 @@
+<!-- Desk icon maker. Open this file in Chrome/Edge to preview the logo.
+     The app icons in public/ were exported from this drawing (D + flame window,
+     rust background). Change the numbers in dPath()/draw() to tweak the logo. -->
+<!doctype html><html><head><meta charset="utf-8"></head>
+<body style="margin:0;background:#777;display:flex;gap:24px;padding:24px;flex-wrap:wrap"><div id="out" hidden></div>
+<script>
+const FLAME = 'M32 3 C35 16 46 22 50 36 C55 52 50 70 32 76 C14 70 9 54 14 40 C17 31 23 27 24 18 C29 25 30 30 30 34 C34 26 34 14 32 3 Z';
+
+// The D, in a 100×100 design grid: a rounded left bar + a half-circle bowl.
+function dPath(p) {
+  const L = 19, T = 18, H = 64, bar = 22, r = 7;   // bowl radius = H/2
+  const cx = L + bar, cy = T + H / 2, R = H / 2;
+  p.moveTo(L + r, T);
+  p.lineTo(cx, T);
+  p.arc(cx, cy, R, -Math.PI / 2, Math.PI / 2);
+  p.lineTo(L + r, T + H);
+  p.quadraticCurveTo(L, T + H, L, T + H - r);
+  p.lineTo(L, T + r);
+  p.quadraticCurveTo(L, T, L + r, T);
+  p.closePath();
+}
+// flame placed by its base centre (x, baseY) and height h (in grid units)
+function flamePath(x, baseY, h) {
+  const s = h / 80, m = new DOMMatrix().translate(x, baseY).scale(s).translate(-32, -76);
+  const p = new Path2D(); p.addPath(new Path2D(FLAME), m); return p;
+}
+
+function draw(size, safe, variant = 'rust') {
+  const c = document.createElement('canvas'); c.width = c.height = size;
+  const g = c.getContext('2d');
+  const BG = {
+    rust: ['#d9793d', '#a8441c', '#6e2810'],
+    espresso: ['#4a3426', '#2a1d14', '#160e09'],
+  }[variant];
+
+  // 1) background: diagonal warm gradient
+  const lin = g.createLinearGradient(0, 0, size, size);
+  lin.addColorStop(0, BG[0]); lin.addColorStop(0.55, BG[1]); lin.addColorStop(1, BG[2]);
+  g.fillStyle = lin; g.fillRect(0, 0, size, size);
+  // soft light from the top left
+  const glow = g.createRadialGradient(size * 0.25, size * 0.18, 0, size * 0.25, size * 0.18, size * 0.75);
+  glow.addColorStop(0, 'rgba(255,236,200,0.28)'); glow.addColorStop(1, 'rgba(255,236,200,0)');
+  g.fillStyle = glow; g.fillRect(0, 0, size, size);
+  // faint paper grain (seeded, so every export looks the same)
+  let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  for (let i = 0; i < size * size * 0.06; i++) {
+    g.fillStyle = rnd() > 0.5 ? 'rgba(255,240,210,0.05)' : 'rgba(0,0,0,0.06)';
+    g.fillRect(rnd() * size, rnd() * size, 1, 1);
+  }
+
+  // 2) work in a 100-unit grid, scaled into the safe area
+  const k = (size * safe) / 100, o = (size - size * safe) / 2;
+  g.save(); g.translate(o, o); g.scale(k, k);
+
+  // the D with a flame-shaped window cut out (evenodd = hole)
+  const d = new Path2D(); dPath(d);
+  const winX = 44.5, winBase = 72, winH = 39;
+  d.addPath(flamePath(winX, winBase, winH));
+
+  // shadow under the D
+  g.save();
+  g.shadowColor = 'rgba(30,10,0,0.45)'; g.shadowBlur = 6 * k; g.shadowOffsetY = 2.2 * k;
+  const cream = g.createLinearGradient(0, 18, 0, 82);
+  cream.addColorStop(0, '#fff6e4'); cream.addColorStop(1, '#ecd9b4');
+  g.fillStyle = cream; g.fill(d, 'evenodd');
+  g.restore();
+
+  // the gold flame glowing inside the window
+  g.save();
+  g.shadowColor = 'rgba(255,190,70,0.6)'; g.shadowBlur = 5 * k;
+  const gold = g.createLinearGradient(0, 40, 0, 72);
+  gold.addColorStop(0, '#ffe08a'); gold.addColorStop(1, '#e8a520');
+  g.fillStyle = gold; g.fill(flamePath(winX, winBase - 3, 27));
+  g.restore();
+  g.fillStyle = '#fff4cf'; g.fill(flamePath(winX, winBase - 4, 13.5)); // hot white core
+
+  g.restore();
+  return c;
+}
+
+const show = (c, label) => { const w = document.createElement('figure'); w.style.margin = 0; w.append(c); const f = document.createElement('figcaption'); f.textContent = label; f.style.cssText = 'font:12px sans-serif;color:#fff'; w.append(f); document.body.append(w); };
+const v = new URLSearchParams(location.search).get('v') || 'rust';
+if (location.search.includes('export')) {
+  const out = {};
+  const put = (name, size, safe) => (out[name] = draw(size, safe, v).toDataURL('image/png'));
+  put('icon-512.png', 512, 0.9); put('icon-192.png', 192, 0.9); put('icon-maskable-512.png', 512, 0.74);
+  put('apple-touch-icon.png', 180, 0.86); put('favicon-48.png', 48, 1.0);
+  document.getElementById('out').textContent = JSON.stringify(out);
+} else {
+  for (const variant of ['rust']) {
+    const big = draw(256, 0.9, variant); big.style.borderRadius = '56px'; show(big, variant + ' (squircle)');
+    const circ = draw(256, 0.74, variant); circ.style.borderRadius = '50%'; show(circ, variant + ' maskable (circle)');
+    const tiny = draw(48, 1.0, variant); show(tiny, '48px');
+  }
+}
+</script></body></html>
