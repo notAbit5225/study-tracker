@@ -1,0 +1,64 @@
+/* Design tokens: every colour, font and spacing value lives here, so changing
+   the look later means editing one file. Dark is the default; light (cream)
+   is switched on with <html data-theme="light">. */
+
+:root {
+  /* palette */
+  --espresso: #221810;
+  --brown: #3b2a1f;
+  --brown-soft: #4a3628;
+  --cream: #f3e6cc;
+  --cream-dim: #cdbb9a;
+  --mustard: #b8860b;
+  --mustard-bright: #d9a520;
+  --rust: #c0652a;
+  --rust-deep: #9e4e1d;
+  --olive: #7d8a4a;
+
+  /* subject colours – used for bars and tags */
+  --c-maths: var(--mustard-bright);
+  --c-english: var(--rust);
+  --c-georgian: var(--olive);
+
+  /* roles (these flip between themes) */
+  --bg: var(--espresso);
+  --surface: var(--brown);
+  --surface-2: var(--brown-soft);
+  --ink: var(--cream);
+  --ink-muted: var(--cream-dim);
+  --accent: var(--rust);
+  --accent-ink: var(--cream);
+  --line: rgba(243, 230, 204, 0.14);
+  --grain-opacity: 0.09;
+
+  /* type */
+  --font-display: 'Young Serif', 'Noto Serif Georgian', Georgia, serif;
+  --font-body: 'Figtree', 'Noto Sans Georgian', system-ui, sans-serif;
+
+  /* spacing scale */
+  --s1: 0.25rem;
+  --s2: 0.5rem;
+  --s3: 0.75rem;
+  --s4: 1rem;
+  --s5: 1.5rem;
+  --s6: 2.25rem;
+  --s7: 3.5rem;
+
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: #f3e6cc;
+  --surface: #ead9b8;
+  --surface-2: #e0cba4;
+  --ink: #2e2017;
+  --ink-muted: #6b5442;
+  --accent: var(--rust-deep);
+  --accent-ink: #fbf3e2;
+  --line: rgba(46, 32, 23, 0.16);
+  --grain-opacity: 0.12;
+  --c-maths: var(--mustard);
+  --c-english: var(--rust-deep);
+  --c-georgian: #5d6a30;
+  color-scheme: light;
+}
