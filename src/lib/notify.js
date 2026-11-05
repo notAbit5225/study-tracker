@@ -34,6 +34,6 @@ export async function notify(title, body) {
     tag: 'desk-timer', // a new one replaces the old one instead of stacking
     renotify: true,
     silent: true, // our own chime is the sound
-    // icon: added in Phase 6 together with the home-screen app icon
+    icon: `${import.meta.env.BASE_URL}icon-192.png`,
   });
 }

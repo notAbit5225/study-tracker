@@ -6,6 +6,12 @@
     <meta name="theme-color" content="#221810" />
     <title>Desk</title>
 
+    <!-- Home-screen install (PWA). %BASE_URL% is replaced by Vite with
+         "/study-tracker/", so the links work on GitHub Pages. -->
+    <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
+    <link rel="icon" type="image/png" href="%BASE_URL%favicon-48.png" />
+    <link rel="apple-touch-icon" href="%BASE_URL%apple-touch-icon.png" />
+
     <!-- Runs before anything is drawn, so a cream-mode user never sees a flash
          of dark (or vice versa). The real value comes from settings later. -->
     <script>

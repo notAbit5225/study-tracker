@@ -9,6 +9,7 @@ import { loadGoals, goalsOn, saveGoals } from '../lib/goals.js';
 import { MILESTONES, listEarned } from '../lib/milestones.js';
 import { badgeSVG } from '../ui/badges.js';
 import { celebrate } from '../ui/celebrate.js';
+import { onInstallable, promptInstall, isInstalled } from '../lib/install.js';
 
 export function render(view) {
   const s = getSettings();
@@ -58,6 +59,11 @@ export function render(view) {
       </section>
 
       <section class="me__device">
+        <div class="install" data-install hidden>
+          <button class="btn btn--quiet" type="button" data-install-btn>Install Desk on this device</button>
+          <p class="hint">Puts it on your home screen. Opens full screen, like an app.</p>
+        </div>
+        <p class="hint" data-installed hidden>Running as the installed app.</p>
         <button class="btn btn--link" type="button" data-logout>Log out on this device</button>
       </section>
       </div>
@@ -278,6 +284,11 @@ export function render(view) {
     btn.addEventListener('click', () => updateSettings({ theme: btn.dataset.themePick }));
   });
 
+  // ── install ───────────────────────────────────────────────────────────────
+  if (isInstalled()) $('[data-installed]').hidden = false;
+  const stopInstall = onInstallable((can) => ($('[data-install]').hidden = !can || isInstalled()));
+  $('[data-install-btn]').addEventListener('click', () => promptInstall());
+
   // ── log out ───────────────────────────────────────────────────────────────
   $('[data-logout]').addEventListener('click', () => supabase.auth.signOut());
 
@@ -291,5 +302,9 @@ export function render(view) {
     });
   }
   sync(s);
-  return onSettingsChange(sync); // the unsubscribe fn = this page's cleanup
+  const stopSync = onSettingsChange(sync);
+  return () => {
+    stopSync();
+    stopInstall();
+  };
 }

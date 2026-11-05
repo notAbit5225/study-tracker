@@ -1204,3 +1204,20 @@
     padding: 0 var(--s5);
   }
 }
+
+.me__device {
+  display: grid;
+  justify-items: start;
+  gap: var(--s4);
+}
+
+.install .hint {
+  margin-top: var(--s1);
+}
+
+/* installed app: no browser bar, so give the top a little room */
+@media (display-mode: standalone) {
+  .side {
+    padding-top: calc(var(--s3) + env(safe-area-inset-top));
+  }
+}
