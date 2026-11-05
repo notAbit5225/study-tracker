@@ -6,7 +6,7 @@ import { TIMEZONE } from '../config.js';
 import { totalsForDay } from '../lib/sessions.js';
 import { goalsOn } from '../lib/goals.js';
 import { loadHistory } from '../lib/history.js';
-import { streakCardHTML } from '../ui/streak-card.js';
+import { streakCardHTML, enableFirePreview } from '../ui/streak-card.js';
 import { onTimer } from '../lib/timer.js';
 import { progressHTML } from '../ui/progress.js';
 
@@ -102,6 +102,7 @@ export function render(view) {
     if (!first) refresh();
   });
 
+  enableFirePreview(view);
   refresh();
   return unsubscribe;
 }

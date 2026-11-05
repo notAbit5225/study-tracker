@@ -14,6 +14,7 @@ import { totalsForDay } from '../lib/sessions.js';
 import { loadGoals, goalsOn } from '../lib/goals.js';
 import { progressHTML } from '../ui/progress.js';
 import { mountNote } from '../ui/note.js';
+import { loadHistory } from '../lib/history.js';
 
 const PREFS_KEY = 'desk-timer-prefs';
 const clockTime = new Intl.DateTimeFormat('en-GB', { timeZone: TIMEZONE, hour: '2-digit', minute: '2-digit' });
@@ -266,6 +267,7 @@ export function render(view) {
       const [totals] = await Promise.all([totalsForDay(), loadGoals()]);
       el.innerHTML = `<h2 class="after__title">Today so far</h2>${progressHTML(totals, goalsOn())}<div data-note-slot></div>`;
       await mountNote(el.querySelector('[data-note-slot]'));
+      loadHistory(); // the block you just saved might have earned a milestone
     } catch (err) {
       console.error(err);
       el.innerHTML = '';

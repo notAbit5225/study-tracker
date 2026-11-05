@@ -6,6 +6,9 @@ import { supabase } from '../lib/supabase.js';
 import { esc } from '../lib/html.js';
 import { paintAvatar } from '../ui/avatar.js';
 import { loadGoals, goalsOn, saveGoals } from '../lib/goals.js';
+import { MILESTONES, listEarned } from '../lib/milestones.js';
+import { badgeSVG } from '../ui/badges.js';
+import { celebrate } from '../ui/celebrate.js';
 
 export function render(view) {
   const s = getSettings();
@@ -49,6 +52,11 @@ export function render(view) {
         </div>
       </section>
 
+      <section class="me__later shelf">
+        <h2>Milestones earned</h2>
+        <ul class="shelf__list" data-shelf></ul>
+      </section>
+
       <section class="me__device">
         <button class="btn btn--link" type="button" data-logout>Log out on this device</button>
       </section>
@@ -66,10 +74,6 @@ export function render(view) {
         </div>
       </form>
 
-      <section class="me__later">
-        <h2>Milestones</h2>
-        <p class="muted">None yet. The first one's at 10 days.</p>
-      </section>
       </div>
     </div>
   `;
@@ -189,6 +193,38 @@ export function render(view) {
       err.textContent = msg;
       err.hidden = false;
     }
+  });
+
+  // ── milestones shelf ──────────────────────────────────────────────────────
+  // Earned badges in colour with their date; the rest as faint outlines.
+  // Tap an earned one to replay its celebration. (While developing on your
+  // laptop with npm run dev, locked ones can be previewed too.)
+  const shelf = $('[data-shelf]');
+  const dateFmt = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  listEarned()
+    .then((earned) => {
+      const got = new Map(earned.map((e) => [e.milestone, e.earned_at]));
+      shelf.innerHTML = MILESTONES.map((m) => {
+        const when = got.get(m.days);
+        return `
+          <li class="shelf__item ${when ? 'is-earned' : 'is-locked'}">
+            <button type="button" data-replay="${m.days}" ${when || import.meta.env.DEV ? '' : 'disabled'}
+              aria-label="${m.days} days${when ? ', earned' : ', not yet'}">
+              ${badgeSVG(m.days)}
+            </button>
+            <span class="shelf__name">${when ? m.name : `${m.days} days`}</span>
+            <span class="shelf__when">${when ? dateFmt.format(new Date(when)) : `at ${m.days} days`}</span>
+          </li>`;
+      }).join('');
+    })
+    .catch((err) => {
+      console.error(err);
+      shelf.innerHTML = `<li class="muted">Couldn't load milestones.</li>`;
+    });
+
+  shelf.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-replay]');
+    if (b && !b.disabled) celebrate(Number(b.dataset.replay));
   });
 
   // ── theme ─────────────────────────────────────────────────────────────────

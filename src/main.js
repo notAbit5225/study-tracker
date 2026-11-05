@@ -6,6 +6,8 @@ import './styles/base.css';
 import './styles/app.css';
 import './styles/timer.css';
 import './styles/calendar.css';
+import './styles/milestones.css';
+import './styles/fire.css';
 
 import { supabase, isConfigured } from './lib/supabase.js';
 import { ensureDefaults, loadSettings } from './lib/settings.js';

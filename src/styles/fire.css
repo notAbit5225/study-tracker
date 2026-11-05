@@ -1,0 +1,139 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   The streak flame. Each layer flickers at its own speed, so together they
+   never repeat in an obvious loop – that's what makes it read as fire.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.fire {
+  width: 3.4rem;
+  height: 4.25rem;
+  flex: none;
+  overflow: visible;
+}
+
+.fire g,
+.fire circle,
+.fire path {
+  transform-box: view-box;
+}
+
+.fire .fl {
+  transform-origin: 32px 76px; /* the base of the flame */
+}
+
+.fire .fl-outer { animation: flick-a 1.7s ease-in-out infinite; }
+.fire .fl-mid { animation: flick-b 1.3s ease-in-out infinite; }
+.fire .fl-inner { animation: flick-a 1.05s ease-in-out infinite reverse; }
+.fire .fl-inner2 { animation: flick-b 0.9s ease-in-out infinite; }
+.fire .fl-core { animation: flick-c 0.8s ease-in-out infinite; }
+
+.fire .fl-tongue--l { transform-origin: 22px 64px; animation: tongue 1.4s ease-in-out infinite; }
+.fire .fl-tongue--r { transform-origin: 42px 64px; animation: tongue 1.6s ease-in-out infinite reverse; }
+
+.fire .fl-wing--l { transform-origin: 30px 64px; animation: wing-l 2.2s ease-in-out infinite; }
+.fire .fl-wing--r { transform-origin: 34px 64px; animation: wing-r 2.2s ease-in-out infinite; }
+
+@keyframes flick-a {
+  0%, 100% { transform: scale(1, 1) skewX(0deg); }
+  30% { transform: scale(0.97, 1.05) skewX(-2.5deg); }
+  60% { transform: scale(1.02, 0.96) skewX(2deg); }
+}
+@keyframes flick-b {
+  0%, 100% { transform: scale(1, 1) skewX(0deg); }
+  40% { transform: scale(1.03, 0.94) skewX(3deg); }
+  70% { transform: scale(0.96, 1.07) skewX(-2deg); }
+}
+@keyframes flick-c {
+  0%, 100% { transform: scale(1, 1); }
+  50% { transform: scale(0.9, 1.12); }
+}
+@keyframes tongue {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(-6deg) scale(1.08, 0.92); }
+}
+@keyframes wing-l {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-7deg) scale(1.04); }
+}
+@keyframes wing-r {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(7deg) scale(1.04); }
+}
+
+/* embers float up and fade out */
+.fire .fl-ember {
+  animation: rise 2.4s var(--d) ease-out infinite;
+  opacity: 0;
+}
+@keyframes rise {
+  0% { transform: translate(0, 0); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translate(var(--x), -46px); opacity: 0; }
+}
+
+/* the glow breathes */
+.fire .fl-glow {
+  transform-origin: 32px 52px;
+  animation: breathe-glow 2.6s ease-in-out infinite;
+}
+@keyframes breathe-glow {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.12); opacity: 1; }
+}
+
+/* golden fire: three sparkles circle the flame */
+.fire .fl-orbit {
+  transform-origin: 32px 48px;
+  animation: orbit 6s linear infinite;
+}
+/* eternal flame: a crown of sparks turning around it */
+.fire .fl-crown {
+  transform-origin: 32px 44px;
+  animation: orbit 9s linear infinite;
+}
+@keyframes orbit {
+  to { transform: rotate(360deg); }
+}
+
+/* bigger tiers get a bit more room */
+.fire--blaze,
+.fire--golden { width: 3.8rem; height: 4.75rem; }
+.fire--phoenix,
+.fire--eternal { width: 4.4rem; height: 5.5rem; }
+
+/* streak card layout: number, flame, "days" */
+.streak-card__num .fire {
+  align-self: flex-end;
+  margin: 0 var(--s1) -0.2rem;
+}
+
+.streak-card__tier {
+  margin: var(--s1) 0 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mustard-bright);
+}
+
+:root[data-theme='light'] .streak-card__tier {
+  color: #8a6408;
+}
+
+.streak-card__tier span {
+  color: var(--ink-muted);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: var(--s2);
+}
+
+.fire[data-preview] {
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fire * {
+    animation: none !important;
+  }
+  .fire .fl-ember {
+    opacity: 0;
+  }
+}

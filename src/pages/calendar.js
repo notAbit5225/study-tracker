@@ -7,7 +7,7 @@ import { addDays, addMonths, monthOf, firstOfMonth, daysInMonth, weekdayMon0, pr
 import { subjectLabel } from '../lib/subjects.js';
 import { esc } from '../lib/html.js';
 import { ICONS, STATUS_LABEL } from '../ui/icons.js';
-import { streakCardHTML } from '../ui/streak-card.js';
+import { streakCardHTML, enableFirePreview } from '../ui/streak-card.js';
 import { progressHTML } from '../ui/progress.js';
 
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -129,6 +129,7 @@ export function render(view) {
     }
   });
 
+  enableFirePreview(view);
   loadHistory()
     .then((h) => {
       history = h;

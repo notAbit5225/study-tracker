@@ -4,6 +4,8 @@ import { tbilisiDay } from './time.js';
 import { loadGoals, goalsOn } from './goals.js';
 import { getSettings } from './settings.js';
 import { computeHistory } from './streak.js';
+import { checkMilestones } from './milestones.js';
+import { celebrate } from '../ui/celebrate.js';
 
 // Supabase returns at most 1000 rows per request, so we fetch in pages.
 // (~3 rows per day → a 1000-row page covers almost a year.)
@@ -30,12 +32,17 @@ export async function loadHistory() {
     totalsByDay.get(r.day)[r.subject] = r.seconds / 60;
   }
 
-  return computeHistory({
+  const history = computeHistory({
     totalsByDay,
     goalsFor: goalsOn,
     start: getSettings().tracking_start,
     today: tbilisiDay(),
   });
+
+  // Not awaited on purpose: the page draws right away, and a celebration
+  // (if one is due) pops up on top a moment later.
+  checkMilestones(history, celebrate);
+  return history;
 }
 
 // Every session on one day, with notes (for the calendar's day panel).

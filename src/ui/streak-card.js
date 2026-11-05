@@ -2,6 +2,14 @@
 // the next skip day is available. Shown on Today and on the Calendar.
 import { formatMinutes } from '../lib/time.js';
 import { prettyDay, shortDay, addDays } from '../lib/days.js';
+import { fireSVG, fireTier, FIRE_TIERS } from './fire.js';
+
+// "Kindling · next flame at 30 days"
+function tierLine(streak) {
+  const t = fireTier(streak);
+  const next = t.next ? `<span>next flame at ${t.next.from} ${t.next.from === 1 ? 'day' : 'days'}</span>` : '<span>the last one. it stays lit as long as you do.</span>';
+  return `<p class="streak-card__tier">${t.name}${next}</p>`;
+}
 
 export function streakCardHTML(h) {
   if (!h.started) {
@@ -43,7 +51,8 @@ export function streakCardHTML(h) {
   return `
     <section class="streak-card ${t.status === 'pending' ? 'is-pending' : 'is-safe'}">
       <p class="kicker">streak</p>
-      <p class="streak-card__num" data-streak="${h.streak}">${h.streak}<span>${h.streak === 1 ? 'day' : 'days'}</span></p>
+      <p class="streak-card__num" data-streak="${h.streak}">${h.streak}${fireSVG(h.streak)}<span>${h.streak === 1 ? 'day' : 'days'}</span></p>
+      ${tierLine(h.streak)}
       <p class="streak-card__line">${todayLine}</p>
       ${heads}
       <dl class="streak-card__meta">
@@ -51,4 +60,21 @@ export function streakCardHTML(h) {
         <div><dt>Skip day</dt><dd>${skip}</dd></div>
       </dl>
     </section>`;
+}
+
+// Dev-only preview (npm run dev): click the flame to step through every tier.
+// The live site never runs this, because import.meta.env.DEV is false there.
+export function enableFirePreview(root) {
+  if (!import.meta.env.DEV) return;
+  let i = 0;
+  root.addEventListener('click', (e) => {
+    const flame = e.target.closest('.streak-card .fire');
+    if (!flame) return;
+    i = (i + 1) % FIRE_TIERS.length;
+    const days = FIRE_TIERS[i].from;
+    const card = flame.closest('.streak-card');
+    flame.outerHTML = fireSVG(days);
+    card.querySelector('.streak-card__tier').outerHTML = tierLine(days);
+    card.querySelector('.streak-card__num').firstChild.textContent = String(days);
+  });
 }
