@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "preview": "vite preview --host"
+    "preview": "vite preview --host",
+    "test": "node tests/streak.test.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0"

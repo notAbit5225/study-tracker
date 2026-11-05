@@ -5,7 +5,9 @@ import { SUBJECTS } from '../lib/subjects.js';
 import { formatMinutes } from '../lib/time.js';
 import { dayStatus } from '../lib/goals.js';
 
-export function progressHTML(totals, goals) {
+// past = true when showing an earlier day (the calendar), so the wording
+// doesn't talk about "today".
+export function progressHTML(totals, goals, { past = false } = {}) {
   const status = dayStatus(totals, goals);
 
   const rows = SUBJECTS.map((s) => {
@@ -39,14 +41,14 @@ export function progressHTML(totals, goals) {
   const verdict = status.full
     ? `<p class="verdict verdict--full">Full day. Every subject hit its target.</p>`
     : status.minimum
-      ? `<p class="verdict verdict--min">Streak's safe for today. Keep going for a full day.</p>`
-      : `<p class="verdict">${formatMinutes(minLeft)} more (any subject) keeps the streak.</p>`;
+      ? `<p class="verdict verdict--min">${past ? 'Minimum hit.' : "Streak's safe for today. Keep going for a full day."}</p>`
+      : `<p class="verdict">${past ? `Under the minimum by ${formatMinutes(minLeft)}.` : `${formatMinutes(minLeft)} more (any subject) keeps the streak.`}</p>`;
 
   return `
     <div class="progress">
       <ul class="bars">${rows}</ul>
       <div class="progress__foot">
-        <p class="progress__total">${formatMinutes(Math.floor(status.total))} total today</p>
+        <p class="progress__total">${formatMinutes(Math.floor(status.total))} total${past ? '' : ' today'}</p>
         ${verdict}
       </div>
     </div>`;

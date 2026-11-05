@@ -4,7 +4,9 @@ import { getSettings } from '../lib/settings.js';
 import { esc } from '../lib/html.js';
 import { TIMEZONE } from '../config.js';
 import { totalsForDay } from '../lib/sessions.js';
-import { loadGoals, goalsOn } from '../lib/goals.js';
+import { goalsOn } from '../lib/goals.js';
+import { loadHistory } from '../lib/history.js';
+import { streakCardHTML } from '../ui/streak-card.js';
 import { onTimer } from '../lib/timer.js';
 import { progressHTML } from '../ui/progress.js';
 
@@ -23,6 +25,19 @@ function prettyDate() {
   return new Intl.DateTimeFormat('en-GB', { timeZone: TIMEZONE, weekday: 'long', day: 'numeric', month: 'long' }).format(
     new Date(),
   );
+}
+
+// If the streak went up since you last looked, give the number a little
+// hop. The last number seen is remembered per device in localStorage.
+function celebrateIfUp(el, streak) {
+  let last = null;
+  try {
+    last = Number(localStorage.getItem('desk-last-streak'));
+    localStorage.setItem('desk-last-streak', String(streak));
+  } catch {
+    /* ignore */
+  }
+  if (last !== null && streak > last) el.querySelector('.streak-card__num')?.classList.add('went-up');
 }
 
 export function render(view) {
@@ -46,10 +61,10 @@ export function render(view) {
            countdown (phase 6) move in here, so the page grows sideways
            instead of getting longer. -->
       <aside class="today__side">
+        <div data-streak></div>
         <section class="note-sheet today__soon">
           <h2>Coming soon</h2>
           <ul class="ruled">
-            <li><span>your streak</span><em>phase 4</em></li>
             <li><span>days until each exam</span><em>phase 6</em></li>
           </ul>
         </section>
@@ -59,11 +74,14 @@ export function render(view) {
 
   const progressEl = view.querySelector('[data-progress]');
   const goEl = view.querySelector('[data-go]');
+  const streakEl = view.querySelector('[data-streak]');
 
   async function refresh() {
     try {
-      const [totals] = await Promise.all([totalsForDay(), loadGoals()]);
+      const [totals, history] = await Promise.all([totalsForDay(), loadHistory()]);
       progressEl.innerHTML = progressHTML(totals, goalsOn());
+      streakEl.innerHTML = streakCardHTML(history);
+      celebrateIfUp(streakEl, history.streak);
     } catch (err) {
       console.error(err);
       progressEl.innerHTML = `<p class="form-error">Couldn't load today's numbers. Refresh?</p>`;

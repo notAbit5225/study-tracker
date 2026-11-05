@@ -5,6 +5,7 @@ import './styles/tokens.css';
 import './styles/base.css';
 import './styles/app.css';
 import './styles/timer.css';
+import './styles/calendar.css';
 
 import { supabase, isConfigured } from './lib/supabase.js';
 import { ensureDefaults, loadSettings } from './lib/settings.js';
@@ -15,6 +16,7 @@ import * as today from './pages/today.js';
 import * as me from './pages/me.js';
 import { placeholder } from './pages/placeholder.js';
 import * as timerPage from './pages/timer.js';
+import * as calendarPage from './pages/calendar.js';
 import { startTimerEngine, stopTimerEngine, onTimer } from './lib/timer.js';
 import { closeMiniTimer } from './ui/mini-timer.js';
 import { registerServiceWorker } from './lib/notify.js';
@@ -27,7 +29,7 @@ const root = document.querySelector('#app');
 const routes = {
   today,
   timer: timerPage,
-  calendar: placeholder('calendar'),
+  calendar: calendarPage,
   stats: placeholder('stats'),
   logbook: placeholder('logbook'),
   me,

@@ -1,0 +1,544 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Calendar grid, day marks, streak card, legend.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cal {
+  display: grid;
+  gap: var(--s6);
+}
+
+.cal__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s4);
+  margin-bottom: var(--s4);
+}
+
+.cal__head h1 {
+  margin: 0;
+}
+
+.cal__arrows {
+  display: flex;
+  gap: var(--s2);
+}
+
+.cal__arrows .chip {
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0.35rem 0.85rem;
+}
+
+.cal__arrows .chip:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.cal__weekdays,
+.cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: clamp(4px, 0.8vw, 8px);
+}
+
+.cal__weekdays {
+  margin-bottom: var(--s2);
+}
+
+.cal__weekdays span {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  text-align: center;
+}
+
+.cal__weekdays span:nth-child(n + 6) {
+  color: var(--mustard-bright); /* the weekend */
+}
+
+/* ── one day ─────────────────────────────────────────────────────────────── */
+
+.day {
+  position: relative;
+  aspect-ratio: 1;
+  border: 0;
+  padding: 0;
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 7px 5px 8px 6px;
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease;
+}
+
+/* slightly different corners on alternate days = less machine-made */
+.day:nth-child(3n) {
+  border-radius: 5px 8px 6px 7px;
+}
+.day:nth-child(4n + 1) {
+  border-radius: 8px 6px 5px 8px;
+}
+
+.day:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+
+.day__n {
+  position: absolute;
+  top: 0.3em;
+  left: 0.45em;
+  font-size: clamp(0.7rem, 1.6vw, 0.88rem);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.day__icon {
+  position: absolute;
+  inset: 22% 12% 8% 12%;
+  display: grid;
+  place-items: center;
+}
+
+.day__icon svg {
+  width: 100%;
+  height: 100%;
+  max-width: 2.6rem;
+  overflow: visible;
+}
+
+/* shared SVG parts */
+.day svg .ring,
+.day svg .mark {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.day svg .dot,
+.day svg .seal,
+.day svg .star {
+  stroke: none;
+}
+
+/* empty / not counted */
+.day--blank {
+  background: none;
+  cursor: default;
+}
+
+.day--before,
+.day--future {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.day--before .day__n {
+  opacity: 0.35;
+}
+
+.day--future .day__n {
+  opacity: 0.55;
+}
+
+.day--future {
+  cursor: default;
+}
+
+/* today, not decided yet */
+.day--pending {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--mustard-bright);
+  background-image: repeating-linear-gradient(-45deg, transparent 0 6px, var(--line) 6px 7px);
+}
+
+/* minimum: a light wash of mustard and a small dot */
+.day--min {
+  background: rgba(217, 165, 32, 0.2);
+  color: var(--mustard-bright);
+}
+
+.day--min .day__n {
+  color: var(--ink);
+}
+
+.day--min .dot {
+  fill: currentColor;
+}
+
+/* full day: a solid badge with a stamped tick */
+.day--full {
+  background: var(--mustard);
+  color: var(--espresso);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.18);
+}
+
+.day--full .day__icon {
+  transform: rotate(-7deg);
+}
+
+/* full day + 1h extra: the gold seal. Deep rust ground, double gold rim,
+   a scalloped seal with a star, tilted like it was pressed by hand. */
+.day--fullplus {
+  background: var(--rust-deep);
+  color: var(--mustard-bright);
+  box-shadow:
+    inset 0 0 0 2px var(--mustard-bright),
+    inset 0 0 0 4px var(--rust-deep),
+    inset 0 0 0 5px rgba(217, 165, 32, 0.55);
+}
+
+.day--fullplus .day__n {
+  color: #fbecc8;
+}
+
+.day--fullplus .day__icon {
+  transform: rotate(-12deg);
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.3));
+}
+
+.day--fullplus .seal {
+  fill: var(--mustard-bright);
+}
+
+.day--fullplus .star {
+  fill: var(--rust-deep);
+}
+
+/* a slow, one-time glint when the calendar opens: subtle, not flashy */
+.day--fullplus::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 240, 200, 0.35) 50%, transparent 65%);
+  background-size: 250% 100%;
+  background-position: 120% 0;
+  animation: glint 1.6s 0.4s ease-out 1 both;
+  pointer-events: none;
+}
+
+@keyframes glint {
+  to {
+    background-position: -40% 0;
+  }
+}
+
+/* skip day: a soft dashed outline and a little bridge */
+.day--skip {
+  background: transparent;
+  box-shadow: none;
+  outline: 1.5px dashed var(--cream-dim);
+  outline-offset: -1.5px;
+  color: var(--cream-dim);
+}
+
+/* missed: dark rust, crossed out */
+.day--missed {
+  background: rgba(158, 78, 29, 0.3);
+  color: var(--rust);
+}
+
+.day--missed .day__n {
+  color: var(--ink-muted);
+}
+
+/* the miss that actually broke a streak gets a torn-looking edge */
+.day--missed.is-broke {
+  background:
+    repeating-linear-gradient(-45deg, transparent 0 4px, rgba(192, 101, 42, 0.18) 4px 6px),
+    rgba(158, 78, 29, 0.38);
+}
+
+/* today + selected rings */
+.day.is-today {
+  outline: 2px solid var(--mustard-bright);
+  outline-offset: 2px;
+}
+
+.day.is-selected {
+  transform: translateY(-3px);
+  box-shadow:
+    0 6px 0 -2px var(--ink),
+    0 0 0 0 transparent;
+}
+
+.day--fullplus.is-selected,
+.day--full.is-selected {
+  box-shadow: 0 6px 0 -2px var(--ink);
+}
+
+/* light (cream) mode tweaks */
+:root[data-theme='light'] .day--min {
+  background: rgba(184, 134, 11, 0.2);
+  color: #8a6408;
+}
+
+:root[data-theme='light'] .day--full {
+  background: var(--mustard);
+  color: #2e2017;
+}
+
+:root[data-theme='light'] .day--skip {
+  outline-color: #6b5442;
+  color: #6b5442;
+}
+
+:root[data-theme='light'] .day--missed {
+  background: rgba(158, 78, 29, 0.18);
+  color: var(--rust-deep);
+}
+
+:root[data-theme='light'] .day--pending {
+  box-shadow: inset 0 0 0 1.5px var(--mustard);
+}
+
+/* ── side: day panel, streak, legend ─────────────────────────────────────── */
+
+.cal__side {
+  display: grid;
+  gap: var(--s6);
+  align-content: start;
+}
+
+.cal__day h2 {
+  font-size: 1.5rem;
+}
+
+.cal__day .kicker {
+  margin-bottom: var(--s1);
+}
+
+.cal__broke {
+  margin: 0 0 var(--s4);
+  color: var(--rust);
+  font-size: 0.92rem;
+}
+
+.cal__day .bars {
+  gap: var(--s4);
+}
+
+.cal__day .bar__name {
+  font-size: 1.1rem;
+}
+
+.cal__sessions {
+  margin-top: var(--s5);
+}
+
+.cal__sessions h3 {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin: 0 0 var(--s2);
+}
+
+.cal__list li {
+  display: grid;
+  gap: var(--s1);
+  border-left: 3px solid var(--sub, var(--line));
+  padding-left: var(--s3);
+}
+
+.cal__list li[data-subject='maths'] {
+  --sub: var(--c-maths);
+}
+.cal__list li[data-subject='english'] {
+  --sub: var(--c-english);
+}
+.cal__list li[data-subject='georgian'] {
+  --sub: var(--c-georgian);
+}
+
+.cal__dist {
+  margin-left: var(--s2);
+  color: var(--rust);
+  font-size: 0.8rem;
+}
+
+.cal__note {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--ink-muted);
+  white-space: pre-wrap; /* keep line breaks from your note */
+}
+
+.legend h2 {
+  font-size: 1.05rem;
+}
+
+.legend ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: var(--s3) var(--s4);
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  font-size: 0.9rem;
+}
+
+.day--sample {
+  width: 2.1rem;
+  flex: none;
+  cursor: default;
+}
+
+.day--sample .day__icon {
+  inset: 14%;
+}
+
+.day--sample::after {
+  animation: none;
+}
+
+/* ── streak card ─────────────────────────────────────────────────────────── */
+
+.streak-card {
+  position: relative;
+  padding: var(--s5);
+  background: var(--surface);
+  border-radius: 14px 3px 14px 3px;
+  border-left: 5px solid var(--mustard);
+}
+
+.streak-card .kicker {
+  margin: 0;
+}
+
+.streak-card__num {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(3.6rem, 9vw, 5.2rem);
+  line-height: 1;
+  display: flex;
+  align-items: baseline;
+  gap: var(--s2);
+}
+
+.streak-card__num span {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--ink-muted);
+}
+
+.streak-card__num.went-up {
+  animation: hop 700ms cubic-bezier(0.3, 1.6, 0.5, 1);
+  transform-origin: left bottom;
+}
+
+@keyframes hop {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  35% {
+    transform: translateY(-10px) scale(1.08);
+    color: var(--mustard-bright);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+.streak-card__line {
+  margin: var(--s2) 0 var(--s4);
+  font-size: 0.95rem;
+}
+
+.streak-card.is-pending .streak-card__line {
+  color: var(--rust);
+}
+
+:root[data-theme='light'] .streak-card.is-pending .streak-card__line {
+  color: var(--rust-deep);
+}
+
+.streak-card__meta {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s3);
+  padding-top: var(--s3);
+  border-top: 1px dashed var(--line);
+}
+
+.streak-card__meta dt {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.streak-card__meta dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.streak-card__best-yet {
+  color: var(--mustard-bright);
+}
+
+:root[data-theme='light'] .streak-card__best-yet {
+  color: #8a6408;
+}
+
+.streak-card--waiting .streak-card__num {
+  opacity: 0.4;
+}
+
+/* ── wide screens ────────────────────────────────────────────────────────── */
+
+@media (min-width: 1100px) {
+  .cal {
+    grid-template-columns: minmax(0, 1.35fr) minmax(19rem, 1fr);
+    gap: var(--s6) clamp(var(--s6), 4vw, 5rem);
+    align-items: start;
+  }
+
+  .cal__month {
+    position: sticky;
+    top: var(--s5);
+  }
+
+  .cal__side {
+    padding-top: var(--s2);
+  }
+
+  .legend ul {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* "yesterday a skip day kept your streak" heads-up */
+.streak-card__heads {
+  margin: 0 0 var(--s4);
+  padding: var(--s2) var(--s3);
+  font-size: 0.88rem;
+  border-left: 2px dashed var(--cream-dim);
+  background: rgba(243, 230, 204, 0.05);
+}
+
+.streak-card__heads--broke {
+  border-left: 2px solid var(--rust);
+}
+
+:root[data-theme='light'] .streak-card__heads {
+  border-left-color: #6b5442;
+  background: rgba(46, 32, 23, 0.04);
+}
+
+:root[data-theme='light'] .streak-card__heads--broke {
+  border-left-color: var(--rust-deep);
+}
