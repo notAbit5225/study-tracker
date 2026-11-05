@@ -111,7 +111,7 @@
   font-size: 0.8rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--mustard-bright);
+  color: var(--gold-ink);
 }
 
 :root[data-theme='light'] .streak-card__tier {

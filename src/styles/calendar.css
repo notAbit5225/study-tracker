@@ -55,7 +55,7 @@
 }
 
 .cal__weekdays span:nth-child(n + 6) {
-  color: var(--mustard-bright); /* the weekend */
+  color: var(--gold-ink); /* the weekend */
 }
 
 /* ── one day ─────────────────────────────────────────────────────────────── */
@@ -159,7 +159,7 @@
 /* minimum: a light wash of mustard and a small dot */
 .day--min {
   background: rgba(217, 165, 32, 0.2);
-  color: var(--mustard-bright);
+  color: var(--gold-ink);
 }
 
 .day--min .day__n {
@@ -185,7 +185,7 @@
    a scalloped seal with a star, tilted like it was pressed by hand. */
 .day--fullplus {
   background: var(--rust-deep);
-  color: var(--mustard-bright);
+  color: var(--gold-ink);
   box-shadow:
     inset 0 0 0 2px var(--mustard-bright),
     inset 0 0 0 4px var(--rust-deep),
@@ -240,7 +240,7 @@
 /* missed: dark rust, crossed out */
 .day--missed {
   background: rgba(158, 78, 29, 0.3);
-  color: var(--rust);
+  color: var(--rust-ink);
 }
 
 .day--missed .day__n {
@@ -315,7 +315,7 @@
 
 .cal__broke {
   margin: 0 0 var(--s4);
-  color: var(--rust);
+  color: var(--rust-ink);
   font-size: 0.92rem;
 }
 
@@ -359,7 +359,7 @@
 
 .cal__dist {
   margin-left: var(--s2);
-  color: var(--rust);
+  color: var(--rust-ink);
   font-size: 0.8rem;
 }
 
@@ -445,7 +445,7 @@
   }
   35% {
     transform: translateY(-10px) scale(1.08);
-    color: var(--mustard-bright);
+    color: var(--gold-ink);
   }
   100% {
     transform: none;
@@ -458,7 +458,7 @@
 }
 
 .streak-card.is-pending .streak-card__line {
-  color: var(--rust);
+  color: var(--rust-ink);
 }
 
 :root[data-theme='light'] .streak-card.is-pending .streak-card__line {
@@ -487,7 +487,7 @@
 }
 
 .streak-card__best-yet {
-  color: var(--mustard-bright);
+  color: var(--gold-ink);
 }
 
 :root[data-theme='light'] .streak-card__best-yet {
@@ -507,9 +507,15 @@
     align-items: start;
   }
 
+  /* The month stays pinned exactly where it starts (the page's top
+     padding is --s7), so it never shifts while the right side scrolls.
+     Its width is also capped by the window height, so all 6 week rows
+     always fit on screen, even on a short laptop display. */
   .cal__month {
     position: sticky;
-    top: var(--s5);
+    top: var(--s7);
+    max-width: calc((100dvh - 15rem) * 1.12);
+    width: 100%;
   }
 
   .cal__side {

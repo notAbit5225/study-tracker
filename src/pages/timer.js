@@ -43,6 +43,7 @@ function restNote(studyMin) {
 
 export function render(view) {
   let drawnKey = null; // what the screen currently shows; redraw when it changes
+  let lastStatus = null; // to spot the moment a study block ends
   let summary = null; // shown after you finish / stop
   let confirming = false;
   let undoTimer = null;
@@ -130,7 +131,7 @@ export function render(view) {
   function restHTML(s) {
     return `
       <section class="run run--rest">
-        <p class="run__label">Rest <span>after ${subjectLabel(s.row.subject).toLowerCase()}</span></p>
+        <p class="run__label">Rest <span>after ${subjectLabel(s.row.subject).toLowerCase()}</span><em class="stamp" data-stamp hidden>saved</em></p>
         <p class="run__clock" data-clock>${formatClock(s.remainingMs)}</p>
         <div class="ruler" aria-hidden="true"><span class="ruler__fill" data-fill></span></div>
         <p class="run__meta">Stand up. Water. Look at something far away.</p>
@@ -200,16 +201,30 @@ export function render(view) {
       else if (s.status === 'rest') view.innerHTML = restHTML(s);
       else view.innerHTML = waitingHTML(s);
 
+      // A study block just ended (finished, rested early, or stopped): let
+      // the next screen arrive with a soft slide, and stamp "saved" on it.
+      const studying = (st) => st === 'study' || st === 'paused';
+      const now = summary ? 'summary' : s.status;
+      if (studying(lastStatus) && !studying(now)) {
+        view.firstElementChild?.classList.add('arrive');
+        const stamp = view.querySelector('[data-stamp]');
+        if (stamp) stamp.hidden = false;
+      }
+
       const after = view.querySelector('[data-after]');
       if (after) fillAfterSession(after);
     }
+    lastStatus = summary ? 'summary' : s.status;
     update(s);
   }
 
   function update(s) {
     if (summary || s.status === 'idle' || s.status === 'waiting') return;
     const clock = view.querySelector('[data-clock]');
-    if (clock) clock.textContent = formatClock(s.remainingMs);
+    if (clock) {
+      clock.textContent = formatClock(s.remainingMs);
+      clock.classList.toggle('is-ending', s.status === 'study' && s.remainingMs <= 10_000);
+    }
     const fill = view.querySelector('[data-fill]');
     if (fill) fill.style.setProperty('--p', String(1 - s.remainingMs / s.lengthMs));
 
@@ -262,7 +277,7 @@ export function render(view) {
 
   // Today's bars + the "what did you study?" note for the block just saved.
   async function fillAfterSession(el) {
-    el.innerHTML = '<p class="muted">adding it up…</p>';
+    el.innerHTML = '<p class="muted is-loading">adding it up…</p>';
     try {
       const [totals] = await Promise.all([totalsForDay(), loadGoals()]);
       el.innerHTML = `<h2 class="after__title">Today so far</h2>${progressHTML(totals, goalsOn())}<div data-note-slot></div>`;

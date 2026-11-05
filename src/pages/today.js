@@ -30,17 +30,35 @@ function prettyDate() {
   );
 }
 
-// If the streak went up since you last looked, give the number a little
-// hop. The last number seen is remembered per device in localStorage.
+// If the streak went up since you last looked, count it up from the old
+// number (9 → 10) and give it a little hop. The last number seen is
+// remembered per device in localStorage.
 function celebrateIfUp(el, streak) {
   let last = null;
   try {
-    last = Number(localStorage.getItem('desk-last-streak'));
+    const raw = localStorage.getItem('desk-last-streak');
+    last = raw === null ? null : Number(raw);
     localStorage.setItem('desk-last-streak', String(streak));
   } catch {
     /* ignore */
   }
-  if (last !== null && streak > last) el.querySelector('.streak-card__num')?.classList.add('went-up');
+  if (last === null || streak <= last) return;
+
+  const num = el.querySelector('.streak-card__num');
+  const digits = num?.firstChild; // the text node before the flame
+  if (!digits || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const from = last;
+  const start = performance.now();
+  const duration = Math.min(900, 250 + (streak - from) * 60);
+  digits.textContent = String(from);
+  requestAnimationFrame(function step(now) {
+    const t = Math.min(1, (now - start) / duration);
+    const eased = 1 - (1 - t) ** 3; // fast start, gentle landing
+    digits.textContent = String(Math.round(from + (streak - from) * eased));
+    if (t < 1) requestAnimationFrame(step);
+    else num.classList.add('went-up'); // the hop, once the number lands
+  });
 }
 
 export function render(view) {
@@ -56,7 +74,7 @@ export function render(view) {
         <div data-review></div>
 
         <section class="today__progress" data-progress>
-          <p class="muted">adding it up…</p>
+          <p class="muted is-loading">adding it up…</p>
         </section>
 
         <div class="today__go" data-go></div>

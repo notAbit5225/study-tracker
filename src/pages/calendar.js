@@ -30,7 +30,7 @@ export function render(view) {
           </div>
         </header>
         <div class="cal__weekdays">${WEEKDAYS.map((d) => `<span>${d}</span>`).join('')}</div>
-        <div class="cal__grid" data-grid><p class="muted">loading…</p></div>
+        <div class="cal__grid" data-grid><p class="muted is-loading">loading…</p></div>
       </section>
 
       <aside class="cal__side">

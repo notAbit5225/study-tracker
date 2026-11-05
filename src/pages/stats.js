@@ -54,7 +54,7 @@ export function render(view) {
         </div>
       </header>
       <div class="stats__grid">
-        <section class="stats__main" data-main><p class="muted">adding it up…</p></section>
+        <section class="stats__main" data-main><p class="muted is-loading">adding it up…</p></section>
         <aside class="stats__side" data-side></aside>
       </div>
     </div>`;
@@ -122,7 +122,7 @@ export function render(view) {
       // one day: the tiles above already show the subjects, so list what you
       // actually did (with your notes) instead of repeating them as bars
       const day = sum.days[0].day;
-      chartEl.innerHTML = '<p class="muted">loading…</p>';
+      chartEl.innerHTML = '<p class="muted is-loading">loading…</p>';
       sessionsOn(day)
         .then((list) => {
           chartEl.innerHTML = list.length

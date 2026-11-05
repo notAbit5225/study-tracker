@@ -61,10 +61,12 @@
 }
 
 /* subject picker: three tabs like the coloured dividers in a binder */
+/* three equal columns that always fit on one row, even on a narrow phone */
 .pick {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--s2);
+  max-width: 28rem;
 }
 
 .pick__opt {
@@ -80,12 +82,14 @@
 
 .pick__opt span {
   display: block;
-  padding: 0.65rem 1.2rem 0.6rem;
+  text-align: center;
+  white-space: nowrap;
+  padding: 0.65rem 0.4rem 0.6rem;
   border: 1.5px solid var(--line);
   border-bottom: 4px solid var(--sub);
   border-radius: 8px 8px 3px 3px;
   font-family: var(--font-display);
-  font-size: 1.15rem;
+  font-size: clamp(0.98rem, 4vw, 1.15rem);
   color: var(--ink-muted);
   transition:
     transform 160ms ease,
@@ -278,7 +282,7 @@ input[type='range']::-moz-range-thumb {
 .distract__btn {
   border: 1.5px dashed var(--rust);
   background: transparent;
-  color: var(--rust);
+  color: var(--rust-ink);
   padding: 0.6rem 1.1rem;
   border-radius: 4px 14px 4px 14px;
   font-weight: 600;
@@ -446,4 +450,57 @@ body.mini {
 
 .run__restnote {
   margin: calc(var(--s3) * -1) 0 0;
+}
+
+/* ── the moment a study block ends ───────────────────────────────────────── */
+.arrive {
+  animation: arrive 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+/* a little rubber stamp next to "Rest" */
+.stamp {
+  display: inline-block;
+  margin-left: var(--s3);
+  padding: 0.05rem 0.5rem;
+  border: 2px solid var(--c-georgian);
+  border-radius: 4px;
+  color: var(--c-georgian);
+  font-family: var(--font-body);
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  transform: rotate(-6deg);
+  animation: stamp-in 420ms 260ms cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+@keyframes stamp-in {
+  0% {
+    opacity: 0;
+    transform: rotate(-16deg) scale(1.8);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(-6deg) scale(1);
+  }
+}
+
+/* the last 10 seconds of a study block: the clock breathes once a second */
+.run__clock.is-ending {
+  animation: ending 1s ease-in-out infinite;
+}
+
+@keyframes ending {
+  50% {
+    color: var(--gold-ink);
+  }
 }

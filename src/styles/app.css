@@ -9,7 +9,7 @@
   font-size: 0.78rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--mustard-bright);
+  color: var(--gold-ink);
   margin: 0 0 var(--s2);
 }
 
@@ -28,7 +28,7 @@
 }
 
 .form-error {
-  color: var(--rust);
+  color: var(--rust-ink);
   font-size: 0.92rem;
   margin: var(--s2) 0 0;
 }
@@ -108,7 +108,7 @@
 }
 
 .btn--link:hover {
-  color: var(--rust);
+  color: var(--rust-ink);
   text-decoration-color: currentColor;
 }
 
@@ -405,7 +405,7 @@
 .ruled em {
   font-style: normal;
   font-size: 0.8rem;
-  color: var(--mustard-bright);
+  color: var(--gold-ink);
   white-space: nowrap;
 }
 
@@ -429,7 +429,7 @@
   flex: none;
   padding: 0.2rem 0.55rem;
   border: 2px solid var(--rust);
-  color: var(--rust);
+  color: var(--rust-ink);
   border-radius: 4px;
   font-size: 0.75rem;
   font-weight: 600;
@@ -488,7 +488,7 @@
 
 .saved {
   font-size: 0.85rem;
-  color: var(--mustard-bright);
+  color: var(--gold-ink);
 }
 
 .saved.pop {
@@ -585,7 +585,7 @@
     font-size: 0.72rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--mustard-bright);
+    color: var(--gold-ink);
   }
 
   /* the tab bar becomes a numbered table of contents */
@@ -762,7 +762,7 @@
 }
 
 .verdict--min {
-  color: var(--mustard-bright);
+  color: var(--gold-ink);
 }
 
 :root[data-theme='light'] .verdict--min {
@@ -1110,7 +1110,7 @@
 .exams__close {
   margin: var(--s2) 0 0;
   font-size: 0.88rem;
-  color: var(--rust);
+  color: var(--rust-ink);
   font-weight: 600;
 }
 

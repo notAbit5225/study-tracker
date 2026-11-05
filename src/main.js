@@ -58,7 +58,7 @@ async function show(session) {
     return;
   }
 
-  root.innerHTML = '<p class="boot">opening your desk…</p>';
+  root.innerHTML = '<p class="boot is-loading">opening your desk…</p>';
   try {
     await ensureDefaults(userId);
     await loadSettings();

@@ -33,6 +33,11 @@
   --line: rgba(243, 230, 204, 0.14);
   --grain-opacity: 0.09;
 
+  /* accent colours for TEXT. Bright on dark; deeper on cream so they stay
+     readable (fills like bars and badges keep the bright versions). */
+  --gold-ink: var(--mustard-bright);
+  --rust-ink: var(--rust);
+
   /* type */
   --font-display: 'Young Serif', 'Noto Serif Georgian', Georgia, serif;
   --font-body: 'Figtree', 'Noto Sans Georgian', system-ui, sans-serif;
@@ -59,6 +64,8 @@
   --accent-ink: #fbf3e2;
   --line: rgba(46, 32, 23, 0.16);
   --grain-opacity: 0.12;
+  --gold-ink: #8a6408;
+  --rust-ink: #9e3f17;
   --c-maths: #ab7e10;
   --c-english: #963318;
   --c-georgian: #00836c;

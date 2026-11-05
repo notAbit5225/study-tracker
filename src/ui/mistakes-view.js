@@ -53,7 +53,7 @@ export function mountMistakes(el) {
           <button type="button" role="radio" data-filter="done">Re-solved</button>
           <button type="button" role="radio" data-filter="all">All</button>
         </div>
-        <ul class="mist__list" data-list><li class="muted">loading…</li></ul>
+        <ul class="mist__list" data-list><li class="muted is-loading">loading…</li></ul>
       </section>
     </div>
     <div class="lightbox" data-lightbox hidden><img alt="" /><p class="muted">tap anywhere to close</p></div>`;

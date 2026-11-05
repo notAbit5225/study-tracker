@@ -27,7 +27,7 @@ export function render(view) {
         <h1>${shortDay(week)} – ${shortDay(weekEnd)}</h1>
       </header>
       <div class="review__grid">
-        <section class="review__summary" data-summary><p class="muted">adding it up…</p></section>
+        <section class="review__summary" data-summary><p class="muted is-loading">adding it up…</p></section>
         <aside class="review__side">
           <div data-last></div>
           <form class="review__ask" data-ask>
@@ -42,7 +42,7 @@ export function render(view) {
           </form>
           <section class="review__archive">
             <h2>Past reviews</h2>
-            <ul class="review__list" data-archive><li class="muted">loading…</li></ul>
+            <ul class="review__list" data-archive><li class="muted is-loading">loading…</li></ul>
           </section>
         </aside>
       </div>

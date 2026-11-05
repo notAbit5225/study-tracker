@@ -232,12 +232,12 @@
 
 .topic__del:hover {
   opacity: 1;
-  color: var(--rust);
+  color: var(--rust-ink);
 }
 
 .topic__confirm {
   font-size: 0.8rem;
-  color: var(--rust);
+  color: var(--rust-ink);
   white-space: nowrap;
 }
 
@@ -402,7 +402,7 @@
   font-size: 0.72rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--rust);
+  color: var(--rust-ink);
 }
 
 .mcard__actions {

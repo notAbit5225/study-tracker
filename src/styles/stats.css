@@ -119,7 +119,7 @@
 }
 
 .tile__sub.is-bad {
-  color: var(--rust);
+  color: var(--rust-ink);
   font-weight: 600;
 }
 
@@ -411,7 +411,7 @@
   font-size: 0.72rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--mustard-bright);
+  color: var(--gold-ink);
 }
 
 :root[data-theme='light'] .review-nudge__k {
@@ -527,7 +527,7 @@
 }
 
 .review__facts .is-bad {
-  color: var(--rust);
+  color: var(--rust-ink);
 }
 
 .review__side {

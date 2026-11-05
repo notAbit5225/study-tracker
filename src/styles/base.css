@@ -76,3 +76,31 @@ select {
 [hidden] {
   display: none !important;
 }
+
+/* "loading…" text breathes gently, so a slow connection looks alive */
+.is-loading {
+  animation: loading-breathe 1.6s ease-in-out infinite;
+}
+
+@keyframes loading-breathe {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+
+/* Touch screens: small controls get a bigger tap area without looking
+   bigger (the padding is invisible). 40px is a comfortable thumb target. */
+@media (pointer: coarse) {
+  .btn--link,
+  .topic__del,
+  .chip,
+  .chart__table-toggle {
+    min-height: 40px;
+  }
+  .topic__del {
+    min-width: 40px;
+  }
+  .topic__mark {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+}

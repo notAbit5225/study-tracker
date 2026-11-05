@@ -26,7 +26,7 @@ export function mountTopics(el) {
       <div class="topics__phone-tabs switch" role="tablist">
         ${SUBJECTS.map((s) => `<button type="button" role="tab" data-phone="${s.id}">${s.label}</button>`).join('')}
       </div>
-      <div class="topics__cols" data-cols><p class="muted">loading…</p></div>
+      <div class="topics__cols" data-cols><p class="muted is-loading">loading…</p></div>
       <p class="form-error" role="alert" data-err hidden></p>
     </div>`;
 

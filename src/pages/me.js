@@ -93,7 +93,7 @@ export function render(view) {
       <form class="me__goals" data-goals>
         <h2>Daily goals</h2>
         <p class="hint">Changes count from today. Past days keep the goals they had.</p>
-        <div class="goals" data-goal-rows><p class="muted">loading…</p></div>
+        <div class="goals" data-goal-rows><p class="muted is-loading">loading…</p></div>
         <div class="me__goals-save">
           <button class="btn btn--primary" type="submit">Save goals</button>
           <span class="saved" data-goals-saved hidden>saved</span>
