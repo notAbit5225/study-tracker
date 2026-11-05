@@ -1,5 +1,5 @@
-// Today: greeting, today's progress per subject, and a way into the timer.
-// Streak (phase 4) and exam countdown (phase 6) join later.
+// Today: greeting, today's progress per subject, a way into the timer, and
+// (on the right) your streak and the exam countdown.
 import { getSettings } from '../lib/settings.js';
 import { esc } from '../lib/html.js';
 import { TIMEZONE } from '../config.js';
@@ -9,6 +9,8 @@ import { loadHistory } from '../lib/history.js';
 import { streakCardHTML, enableFirePreview } from '../ui/streak-card.js';
 import { onTimer } from '../lib/timer.js';
 import { progressHTML } from '../ui/progress.js';
+import { countdownHTML } from '../ui/countdown.js';
+import { tbilisiDay } from '../lib/time.js';
 
 function greeting() {
   // The hour in Tbilisi, not on the device clock.
@@ -57,17 +59,11 @@ export function render(view) {
         <div class="today__go" data-go></div>
       </div>
 
-      <!-- Right-hand column on wide screens: streak (phase 4) and exam
-           countdown (phase 6) move in here, so the page grows sideways
-           instead of getting longer. -->
+      <!-- Right-hand column on wide screens: streak + exam countdown, so the
+           page grows sideways instead of getting longer. -->
       <aside class="today__side">
         <div data-streak></div>
-        <section class="note-sheet today__soon">
-          <h2>Coming soon</h2>
-          <ul class="ruled">
-            <li><span>days until each exam</span><em>phase 6</em></li>
-          </ul>
-        </section>
+        <div data-countdown></div>
       </aside>
     </div>
   `;
@@ -75,6 +71,8 @@ export function render(view) {
   const progressEl = view.querySelector('[data-progress]');
   const goEl = view.querySelector('[data-go]');
   const streakEl = view.querySelector('[data-streak]');
+  const countdownEl = view.querySelector('[data-countdown]');
+  countdownEl.innerHTML = countdownHTML(getSettings(), tbilisiDay());
 
   async function refresh() {
     try {

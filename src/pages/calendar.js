@@ -9,6 +9,7 @@ import { esc } from '../lib/html.js';
 import { ICONS, STATUS_LABEL } from '../ui/icons.js';
 import { streakCardHTML, enableFirePreview } from '../ui/streak-card.js';
 import { progressHTML } from '../ui/progress.js';
+import { getSettings } from '../lib/settings.js';
 
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -48,11 +49,21 @@ export function render(view) {
 
   const $ = (sel) => view.querySelector(sel);
 
+  // which day is which exam: { '2026-06-16': 'maths', … }
+  const examOn = {};
+  const st = getSettings();
+  for (const id of ['maths', 'english', 'georgian']) {
+    if (st[`exam_date_${id}`]) examOn[st[`exam_date_${id}`]] = id;
+  }
+
   function drawMonth() {
     $('[data-month-title]').textContent = prettyMonth(month);
     const startMonth = monthOf(history.start < today ? history.start : today);
     $('[data-step="-1"]').disabled = month <= startMonth;
-    $('[data-step="1"]').disabled = month >= monthOf(today);
+    // you can look ahead up to the month of your last exam
+    const lastExam = Object.keys(examOn).sort().at(-1);
+    const maxMonth = lastExam && monthOf(lastExam) > monthOf(today) ? monthOf(lastExam) : monthOf(today);
+    $('[data-step="1"]').disabled = month >= maxMonth;
 
     const first = firstOfMonth(month);
     const blanks = weekdayMon0(first); // empty cells before the 1st
@@ -63,17 +74,19 @@ export function render(view) {
       const day = addDays(first, n);
       const info = history.days.get(day);
       const kind = day > today ? 'future' : !info ? 'before' : info.status;
+      const exam = examOn[day]; // must exist before the class list below uses it
       const classes = [
         'day',
         `day--${kind}`,
         info?.broke ? 'is-broke' : '',
         day === today ? 'is-today' : '',
         day === selected ? 'is-selected' : '',
+        exam ? `has-exam exam--${exam}` : '',
       ].join(' ');
       const clickable = kind !== 'future';
       cells.push(`
         <button class="${classes}" data-day="${day}" ${clickable ? '' : 'disabled'}
-          aria-label="${prettyDay(day)}${info ? `, ${STATUS_LABEL[info.status]}` : ''}">
+          aria-label="${prettyDay(day)}${info ? `, ${STATUS_LABEL[info.status]}` : ''}${exam ? `, ${subjectLabel(exam)} exam` : ''}">
           <span class="day__n">${n + 1}</span>
           ${ICONS[kind] ? `<span class="day__icon">${ICONS[kind]}</span>` : ''}
         </button>`);

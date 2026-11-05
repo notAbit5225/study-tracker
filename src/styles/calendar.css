@@ -542,3 +542,18 @@
 :root[data-theme='light'] .streak-card__heads--broke {
   border-left-color: var(--rust-deep);
 }
+
+/* exam day: a little folded flag in the subject's colour, top-right corner */
+.day.has-exam::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 42%;
+  height: 42%;
+  background: linear-gradient(225deg, var(--exam-c) 50%, transparent 50%);
+  border-top-right-radius: inherit;
+}
+.day.exam--maths { --exam-c: var(--c-maths); }
+.day.exam--english { --exam-c: var(--c-english); }
+.day.exam--georgian { --exam-c: var(--c-georgian); }

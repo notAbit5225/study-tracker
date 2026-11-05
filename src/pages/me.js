@@ -1,5 +1,5 @@
-// You: name, profile picture, daily goals, theme, log out. Exam dates and
-// milestones join this page in later phases.
+// You: name, photo, theme, milestones, log out (left) and daily goals +
+// exam dates (right).
 import { getSettings, updateSettings, onSettingsChange } from '../lib/settings.js';
 import { uploadAvatar, removeAvatar, checkFile } from '../lib/avatar.js';
 import { supabase } from '../lib/supabase.js';
@@ -63,6 +63,27 @@ export function render(view) {
       </div>
 
       <div class="me__col me__col--goals">
+      <form class="me__exams" data-exams>
+        <h2>Exam dates</h2>
+        <p class="hint">Leave one empty until it's announced. Today counts them down.</p>
+        <div class="exam-fields">
+          ${['maths', 'english', 'georgian']
+            .map(
+              (id) => `
+            <label class="exam-field" data-subject="${id}">
+              <span>${id[0].toUpperCase() + id.slice(1)}</span>
+              <input type="date" name="${id}" value="${s[`exam_date_${id}`] ?? ''}" />
+            </label>`,
+            )
+            .join('')}
+        </div>
+        <div class="me__goals-save">
+          <button class="btn btn--primary" type="submit">Save dates</button>
+          <span class="saved" data-exams-saved hidden>saved</span>
+          <p class="form-error" role="alert" data-exams-error hidden></p>
+        </div>
+      </form>
+
       <form class="me__goals" data-goals>
         <h2>Daily goals</h2>
         <p class="hint">Changes count from today. Past days keep the goals they had.</p>
@@ -191,6 +212,31 @@ export function render(view) {
 
     function showErr(msg) {
       err.textContent = msg;
+      err.hidden = false;
+    }
+  });
+
+  // ── exam dates ────────────────────────────────────────────────────────────
+  const examsForm = $('[data-exams]');
+  examsForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const err = $('[data-exams-error]');
+    err.hidden = true;
+    try {
+      // an empty date box means "not announced yet" → store null
+      await updateSettings({
+        exam_date_maths: examsForm.maths.value || null,
+        exam_date_english: examsForm.english.value || null,
+        exam_date_georgian: examsForm.georgian.value || null,
+      });
+      const saved = $('[data-exams-saved]');
+      saved.hidden = false;
+      saved.classList.remove('pop');
+      void saved.offsetWidth;
+      saved.classList.add('pop');
+    } catch (e2) {
+      console.error(e2);
+      err.textContent = "Didn't save. Try again?";
       err.hidden = false;
     }
   });

@@ -941,9 +941,10 @@
 .me__id { order: 1; }
 .me__name { order: 2; }
 .me__goals { order: 3; }
-.me__look { order: 4; }
-.me__later { order: 5; }
-.me__device { order: 6; }
+.me__exams { order: 4; }
+.me__look { order: 5; }
+.me__later { order: 6; }
+.me__device { order: 7; }
 
 .today__side {
   display: grid;
@@ -1025,5 +1026,177 @@
 
   .after--rest .note {
     margin-top: var(--s5);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Exam countdown (Today) + exam dates (You)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.exams [data-subject='maths'],
+.exams[data-subject='maths'],
+.exam-field[data-subject='maths'] { --sub: var(--c-maths); }
+.exams [data-subject='english'],
+.exam-field[data-subject='english'] { --sub: var(--c-english); }
+.exams [data-subject='georgian'],
+.exam-field[data-subject='georgian'] { --sub: var(--c-georgian); }
+
+/* a ticket stub: punched holes down the left edge */
+.exams {
+  position: relative;
+  padding: var(--s5) var(--s5) var(--s4) calc(var(--s5) + 0.9rem);
+  background: var(--surface);
+  border-radius: 4px 14px 4px 4px;
+  transform: rotate(0.5deg);
+}
+
+.exams::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 0.55rem;
+  width: 7px;
+  background-image: radial-gradient(circle, var(--bg) 3px, transparent 3.5px);
+  background-size: 7px 15px;
+  background-repeat: repeat-y;
+}
+
+.exams .kicker {
+  margin-bottom: var(--s3);
+}
+
+.exams__next {
+  padding-bottom: var(--s4);
+  margin-bottom: var(--s3);
+  border-bottom: 1px dashed var(--line);
+}
+
+.exams__next-label {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--sub);
+}
+
+.exams__next-label span {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  margin-left: var(--s2);
+}
+
+.exams__next-days {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 4.2rem);
+  line-height: 1.05;
+  display: flex;
+  align-items: baseline;
+  gap: var(--s2);
+  font-variant-numeric: tabular-nums;
+}
+
+.exams__next-days span {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--ink-muted);
+}
+
+.exams__close {
+  margin: var(--s2) 0 0;
+  font-size: 0.88rem;
+  color: var(--rust);
+  font-weight: 600;
+}
+
+.exams__rest {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.exams__row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: baseline;
+  gap: var(--s3);
+  padding: 0.45rem 0 0.45rem var(--s3);
+  border-left: 3px solid var(--sub);
+}
+
+.exams__row + .exams__row {
+  margin-top: var(--s2);
+}
+
+.exams__name {
+  font-weight: 600;
+}
+
+.exams__date {
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+}
+
+.exams__days strong {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+}
+
+.exams__days {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  min-width: 4.5rem;
+  text-align: right;
+}
+
+.exams__row.is-past {
+  opacity: 0.5;
+}
+
+.exams__empty {
+  margin: 0;
+  color: var(--ink-muted);
+}
+
+/* exam date pickers on the You page */
+
+.exam-fields {
+  display: grid;
+  gap: var(--s3);
+  margin: var(--s4) 0;
+  max-width: 28rem;
+}
+
+.exam-field {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--s3);
+  padding-left: var(--s3);
+  border-left: 3px solid var(--sub);
+}
+
+.exam-field input {
+  background: var(--surface);
+  border: 1.5px solid transparent;
+  border-bottom-color: var(--line);
+  border-radius: 4px 4px 0 0;
+  padding: 0.4rem 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.exam-field input:focus {
+  outline: none;
+  border-bottom-color: var(--mustard-bright);
+}
+
+@media (min-width: 1100px) {
+  .me__col--goals .exam-fields {
+    max-width: none;
+  }
+  .me__col--goals .me__exams {
+    padding: 0 var(--s5);
   }
 }
